@@ -175,10 +175,10 @@ __interrupt void Timer1_ISR(void)
     adcChargeVolt    = ADC_RESULT(c,1); // ADCC1 ADC_VBATT_CHG
     adcChargeCurr    = ADC_RESULT(c,2); // ADCC6 ADC_ICHG
 
-    if (adcChargeCurr >= CURR_ADC2_OFFSET)
-        adcChargeCurr = adcChargeCurr - CURR_ADC2_OFFSET;
-    else
-        adcChargeCurr = 0;
+//    if (adcChargeCurr >= CURR_ADC2_OFFSET)
+//        adcChargeCurr = adcChargeCurr - CURR_ADC2_OFFSET;
+//    else
+//        adcChargeCurr = 0;
 
     if (adcOutputCurr >= CURR_ADC2_OFFSET)
         adcOutputCurr = adcOutputCurr - CURR_ADC2_OFFSET;
@@ -254,9 +254,9 @@ __interrupt void Timer1_ISR(void)
     if (chargerSoftstartFlag)
         CurrsoftstartDone = Soft_Start_Routine_Curr();
     //====================== CHG UVP==========================
-    if(adcOutputVolt > 2470 || adcInnerVolt > 2470)
+    if(adcOutputVolt > 2470 || adcInnerVolt > 2470)// 2470 = bus 600V
         chargerSoftstartFlag = 1;
-    if (chargerSoftstartFlag == 1 && adcChargeVolt < 2388)
+    if (chargerSoftstartFlag == 1 && adcChargeVolt < 2388) // 2388 = batt 217V
     {
         Set_Ahb_Mode(AHB_OFF_MODE);
         CHG_DRIVER_DISABLE();

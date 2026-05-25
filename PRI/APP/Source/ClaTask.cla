@@ -117,12 +117,12 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
             ahbPeriodiloop = (long)ahbCurrLoop.output;
             ahbPeriodvloop = (long)ahbVoltLoop.output;
 
-            if(claAhbState.bit.ccEnableDrive && !claAhbState.bit.cvEnableDrive)
-                ahbPeriod = ahbPeriodiloop;
-            else if (claAhbState.bit.cvEnableDrive && !claAhbState.bit.ccEnableDrive)
-                ahbPeriod = ahbPeriodvloop;
-            else
-            {
+//            if(claAhbState.bit.ccEnableDrive && !claAhbState.bit.cvEnableDrive)
+//                ahbPeriod = ahbPeriodiloop;
+//            else if (claAhbState.bit.cvEnableDrive && !claAhbState.bit.ccEnableDrive)
+//                ahbPeriod = ahbPeriodvloop;
+//            else
+//            {
                 if (ahbPeriodiloop < ahbPeriodvloop)
                     ahbPeriod = ahbPeriodiloop;
                 else
@@ -725,7 +725,8 @@ void CLA_SOTCPACK(void)
 
 void CLA_AHB_V_Loop_Routine(void)
 {
-    ahbVoltLoop.error =  (float)(CPU_VCharge_Ref - CPU_AHB_Vout);
+    ahbVoltLoop.error =  (float)(11008 - CPU_AHB_Vout);
+//    ahbVoltLoop.error =  (float)(CPU_VCharge_Ref - CPU_AHB_Vout);
     ahbVoltLoop.pYn = ahbVoltLoop.kp * ahbVoltLoop.error;
     ahbVoltLoop.iYn = ahbVoltLoop.ki * ahbVoltLoop.error;
     ahbVoltLoop.iYn += ahbVoltLoop.iYn1;
@@ -746,7 +747,8 @@ void CLA_AHB_V_Loop_Routine(void)
 
 void CLA_AHB_I_Loop_Routine(void)
 {
-    ahbCurrLoop.error = (float)(CPU_ICharge_Ref - CPU_AHB_Iout);
+    ahbCurrLoop.error = (float)(2240 - CPU_AHB_Iout);
+//    ahbCurrLoop.error = (float)(CPU_ICharge_Ref - CPU_AHB_Iout);
     ahbCurrLoop.pYn = ahbCurrLoop.kp * ahbCurrLoop.error;
     ahbCurrLoop.iYn = ahbCurrLoop.ki * ahbCurrLoop.error;
     ahbCurrLoop.iYn += ahbCurrLoop.iYn1;
