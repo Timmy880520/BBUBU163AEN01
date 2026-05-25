@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "eventlog.h": "c",
+        "int_protocol_table.h": "c"
+    }
+}
