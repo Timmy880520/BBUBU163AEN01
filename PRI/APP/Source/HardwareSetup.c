@@ -1316,25 +1316,25 @@ void Setup_Pwm(void)
     EPwm6Regs.DBCTL.bit.SHDWDBFEDMODE = 1;
     EPwm6Regs.DBCTL.bit.HALFCYCLE = 0;
 
-    EPwm6Regs.DBRED.bit.DBRED = 20; //wait for determine DT
-    EPwm6Regs.DBFED.bit.DBFED = 20;
+    EPwm6Regs.DBRED.bit.DBRED = 60; //wait for determine DT
+    EPwm6Regs.DBFED.bit.DBFED = 60;
 
-    EALLOW;
-    InputXbarRegs.INPUT2SELECT = 9;
-    EPwm6Regs.DCTRIPSEL.bit.DCALCOMPSEL = DC_TRIPIN2;
-    EPwm6Regs.TZDCSEL.bit.DCAEVT1 = TZ_DCAL_HI;
-    EPwm6Regs.DCACTL.bit.EVT1SRCSEL = DC_EVT1;
-    EPwm6Regs.TZSEL.bit.DCAEVT1 = 1;
-    EPwm6Regs.TZCTL.bit.DCAEVT1 = 3;
-
-    EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX3 = 0x0; //CMPSS2L
-    EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX3 = 1;
-    EPwm6Regs.DCTRIPSEL.bit.DCAHCOMPSEL = DC_TRIPIN7;
-    EPwm6Regs.TZDCSEL.bit.DCAEVT2 = TZ_DCAH_HI;
-    EPwm6Regs.DCACTL.bit.EVT2SRCSEL = DC_EVT2;
-    EPwm6Regs.TZSEL.bit.DCAEVT2 = 1;
-    EPwm6Regs.TZCTL.bit.DCAEVT2 = 3;
-    EDIS;
+//    EALLOW;
+//    InputXbarRegs.INPUT2SELECT = 9;
+//    EPwm6Regs.DCTRIPSEL.bit.DCALCOMPSEL = DC_TRIPIN2;
+//    EPwm6Regs.TZDCSEL.bit.DCAEVT1 = TZ_DCAL_HI;
+//    EPwm6Regs.DCACTL.bit.EVT1SRCSEL = DC_EVT1;
+//    EPwm6Regs.TZSEL.bit.DCAEVT1 = 1;
+//    EPwm6Regs.TZCTL.bit.DCAEVT1 = 3;
+//
+//    EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX3 = 0x0; //CMPSS2L
+//    EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX3 = 1;
+//    EPwm6Regs.DCTRIPSEL.bit.DCAHCOMPSEL = DC_TRIPIN7;
+//    EPwm6Regs.TZDCSEL.bit.DCAEVT2 = TZ_DCAH_HI;
+//    EPwm6Regs.DCACTL.bit.EVT2SRCSEL = DC_EVT2;
+//    EPwm6Regs.TZSEL.bit.DCAEVT2 = 1;
+//    EPwm6Regs.TZCTL.bit.DCAEVT2 = 3;
+//    EDIS;
 
     EPwm3Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
     EPwm3Regs.TBCTL.bit.PHSEN = TB_DISABLE;

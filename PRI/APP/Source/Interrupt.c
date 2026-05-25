@@ -253,22 +253,15 @@ __interrupt void Timer1_ISR(void)
         softstartDone = Soft_Start_Routine();
     if (chargerSoftstartFlag)
         CurrsoftstartDone = Soft_Start_Routine_Curr();
-    //====================== CHG UVP==========================
-    if(adcOutputVolt > 2470 || adcInnerVolt > 2470)// 2470 = bus 600V
-        chargerSoftstartFlag = 1;
-    if (chargerSoftstartFlag == 1 && adcChargeVolt < 2388) // 2388 = batt 217V
-    {
-        Set_Ahb_Mode(AHB_OFF_MODE);
-        CHG_DRIVER_DISABLE();
-    }
+
     //====================== CHG OCP==========================
     if(avgChargeCurr.cma > 745) //4A*150m*(4095/3.3) = 744.54
     {
         if(++countChgScp > COUNT_100us_IN_50kHz)
         {
             countChgScp = 0;
-            Set_Ahb_Mode(AHB_OFF_MODE);
-            CHG_Driver_Disable();
+//            Set_Ahb_Mode(AHB_OFF_MODE);
+//            CHG_Driver_Disable();
             warningCode.flag.bit.iChargeOcFault = 1;
         }
     }
@@ -282,8 +275,8 @@ __interrupt void Timer1_ISR(void)
         if(++countChgOcp > COUNT_1ms_IN_50kHz)
         {
             countChgOcp = 0;
-            Set_Ahb_Mode(AHB_OFF_MODE);
-            CHG_Driver_Disable();
+//            Set_Ahb_Mode(AHB_OFF_MODE);
+//            CHG_Driver_Disable();
             warningCode.flag.bit.iChargeOcFault = 1;
         }
     }

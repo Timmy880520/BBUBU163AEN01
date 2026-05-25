@@ -127,11 +127,15 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
                     ahbPeriod = ahbPeriodiloop;
                 else
                     ahbPeriod = ahbPeriodvloop;
-            }
+//            }
 
             #if (AHBTestMode)
                     EPwm6Regs.CMPA.bit.CMPA = ahbTestPeriod;
             #else
+                    if(ahbPeriod > 240)
+                        ahbPeriod = 240;
+                    if(ahbPeriod < 40)
+                        ahbPeriod = 40;
                     EPwm6Regs.CMPA.bit.CMPA = ahbPeriod;
             #endif
             break;
@@ -725,7 +729,7 @@ void CLA_SOTCPACK(void)
 
 void CLA_AHB_V_Loop_Routine(void)
 {
-    ahbVoltLoop.error =  (float)(11008 - CPU_AHB_Vout);
+    ahbVoltLoop.error =  (float)(2201 - CPU_AHB_Vout);
 //    ahbVoltLoop.error =  (float)(CPU_VCharge_Ref - CPU_AHB_Vout);
     ahbVoltLoop.pYn = ahbVoltLoop.kp * ahbVoltLoop.error;
     ahbVoltLoop.iYn = ahbVoltLoop.ki * ahbVoltLoop.error;

@@ -625,7 +625,7 @@ void State_Machine(void)
 //                Sr_Pwm_Off();
 //            }
 //        }
-        if(BBU_Kill_Status() = BBU_Kill())
+        if(BBU_Kill())
         {
             Set_Llc_Mode(LLC_ON_MODE);
             LLC_Driver_Enable();
@@ -633,11 +633,11 @@ void State_Machine(void)
             SR_Driver_Disable();
             Sr_Pwm_Off();
         }
-        if(BBU_Kill_Status() = NON_BBU_Kill())
+        if(NON_BBU_Kill())
         {
             Set_Llc_Mode(LLC_OFF_MODE);
             LLC_Driver_Disable();
-            Oring_off();
+            Oring_Off();
             SR_Driver_Disable();
             Sr_Pwm_Off();
         }
@@ -703,7 +703,6 @@ void State_Machine(void)
 //                chargerSoftstartFlag = 0;
 //                Set_Ahb_Mode(AHB_ON_MODE);
 //                ahbVoltReference += 2;
-//
 //                if (ahbVoltReference >= ahbVoltSetpoint)
 //                {
 //                    ahbVoltReference = ahbVoltSetpoint; // ahbVoltSetpoint = 13342
