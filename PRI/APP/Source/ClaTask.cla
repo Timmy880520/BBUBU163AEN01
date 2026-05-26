@@ -80,6 +80,9 @@ float SR_Deadband_Test;
 unsigned long CLA_ADC_VOUT;
 unsigned long CLA_ADC_IOUT;
 unsigned long testdac;
+//timmy debug
+uint16_t ahbPeriodCmd;
+Uint16 ahbSoftStartFlag;
 //------------------------------------------------------------------------------
 // Interrupt Task
 //------------------------------------------------------------------------------
@@ -117,25 +120,73 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
             ahbPeriodiloop = (long)ahbCurrLoop.output;
             ahbPeriodvloop = (long)ahbVoltLoop.output;
 
-//            if(claAhbState.bit.ccEnableDrive && !claAhbState.bit.cvEnableDrive)
-//                ahbPeriod = ahbPeriodiloop;
-//            else if (claAhbState.bit.cvEnableDrive && !claAhbState.bit.ccEnableDrive)
-//                ahbPeriod = ahbPeriodvloop;
-//            else
-//            {
-                if (ahbPeriodiloop < ahbPeriodvloop)
-                    ahbPeriod = ahbPeriodiloop;
-                else
-                    ahbPeriod = ahbPeriodvloop;
-//            }
+////            if(claAhbState.bit.ccEnableDrive && !claAhbState.bit.cvEnableDrive)
+////                ahbPeriod = ahbPeriodiloop;
+////            else if (claAhbState.bit.cvEnableDrive && !claAhbState.bit.ccEnableDrive)
+////                ahbPeriod = ahbPeriodvloop;
+////            else
+////            {
+//                if (ahbPeriodiloop < ahbPeriodvloop)
+//                    ahbPeriod = ahbPeriodiloop;
+//                else
+//                    ahbPeriod = ahbPeriodvloop;
+////            }
 
+                if (ahbPeriodiloop < ahbPeriodvloop)
+                    ahbPeriodCmd = ahbPeriodiloop;
+                else
+                    ahbPeriodCmd = ahbPeriodvloop;
             #if (AHBTestMode)
                     EPwm6Regs.CMPA.bit.CMPA = ahbTestPeriod;
             #else
-                    if(ahbPeriod > 240)
-                        ahbPeriod = 240;
-                    if(ahbPeriod < 40)
-                        ahbPeriod = 40;
+//                    if(ahbPeriod > 240)
+//                        ahbPeriod = 240;
+//                    if(ahbPeriod < 40)
+//                        ahbPeriod = 40;
+                    if(ahbPeriodCmd > AHB_PERIOD_MAX)
+                        ahbPeriodCmd = AHB_PERIOD_MAX;
+                    if(ahbPeriodCmd < AHB_PERIOD_MIN)
+                        ahbPeriodCmd = AHB_PERIOD_MIN;
+
+                    if((ahbPeriod == AHB_PERIOD_MIN) &&
+                       (ahbPeriodCmd > AHB_PERIOD_MIN) &&
+                       (!ahbSoftStartFlag))
+                    {
+                        ahbSoftStartFlag = 1;
+                    }
+
+                    if(ahbSoftStartFlag)
+                    {
+                        // restart soft start mode
+
+                        ahbPeriod += AHB_PERIOD_STEP_UP;
+
+                        if(ahbPeriod >= ahbPeriodCmd)
+                        {
+                            ahbPeriod = ahbPeriodCmd;
+                            ahbSoftStartFlag = 0;
+                        }
+                    }
+                    else
+                    {
+                        // normal slew limiter
+
+                        if(ahbPeriod < ahbPeriodCmd)
+                        {
+                            ahbPeriod += AHB_PERIOD_STEP_UP;
+
+                            if(ahbPeriod > ahbPeriodCmd)
+                                ahbPeriod = ahbPeriodCmd;
+                        }
+                        else if(ahbPeriod > ahbPeriodCmd)
+                        {
+                            ahbPeriod -= AHB_PERIOD_STEP_DOWN;
+
+                            if(ahbPeriod < ahbPeriodCmd)
+                                ahbPeriod = ahbPeriodCmd;
+                        }
+                    }
+
                     EPwm6Regs.CMPA.bit.CMPA = ahbPeriod;
             #endif
             break;
