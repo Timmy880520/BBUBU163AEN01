@@ -43,11 +43,12 @@
 #define Default_CLA_Type_III_PI_KA     5.981f   //9.883f   //9.456f   //7.306f   //5.981f//750Hz    //4.376f//580Hz    //4.103f//550Hz  //3.884f//525Hz //3.666f//500Hz     //3.233f//400Hz    //4.947f
 #define Default_CLA_Type_III_PI_Limit  0.167f   //0.101f   //0.106f   //0.137f   //0.167f           //0.219f           //0.228f            //0.244f        //0.258f        //0.273f            //0.309f           //0.201f
 */
-//timmy debug
+
 #define AHB_PERIOD_MAX          240
 #define AHB_PERIOD_MIN          40
+
 #define AHB_PERIOD_STEP_UP      1
-#define AHB_PERIOD_STEP_DOWN    3
+#define AHB_PERIOD_STEP_DOWN    1
 // Low pass filter of VCS
 #define Default_CLA_VCS_LPF_B0         0.7153f   //0.3858f
 #define Default_CLA_VCS_LPF_B1         0.7153f   //0.0f

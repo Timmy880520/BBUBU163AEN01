@@ -780,7 +780,7 @@ void CLA_SOTCPACK(void)
 
 void CLA_AHB_V_Loop_Routine(void)
 {
-    ahbVoltLoop.error =  (float)(2201 - CPU_AHB_Vout);
+    ahbVoltLoop.error =  (float)(11008 - CPU_AHB_Vout);
 //    ahbVoltLoop.error =  (float)(CPU_VCharge_Ref - CPU_AHB_Vout);
     ahbVoltLoop.pYn = ahbVoltLoop.kp * ahbVoltLoop.error;
     ahbVoltLoop.iYn = ahbVoltLoop.ki * ahbVoltLoop.error;

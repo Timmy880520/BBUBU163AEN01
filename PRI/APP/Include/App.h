@@ -105,7 +105,7 @@ History:
 
 // App version
 #ifndef App_Version
-#define App_Version             "S1.00B05"
+#define App_Version             "S1.00B052"
 #endif
 
 #ifndef Sub_Version
