@@ -226,9 +226,9 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
 
             #if (FixFreq && LLCTestMode)
                 //claDuty.period = 230; //260kHz
-                claDuty.period = 571;//TBPRD_Test; //123kHz
-                claDuty.srDeadband = 30;//0xFFFF;//SR_Deadband_Test;   //30=250ns   //36;  //36=300ns
-                claDuty.priDeadband = 30;//SR_Deadband_Test;   //30=250ns   //36;  //36=300ns
+                claDuty.period = 300;//TBPRD_Test; //123kHz
+                claDuty.srDeadband = 60;//0xFFFF;//SR_Deadband_Test;   //30=250ns   //36;  //36=300ns
+                claDuty.priDeadband = 60;//SR_Deadband_Test;   //30=250ns   //36;  //36=300ns
 
             #endif
 
@@ -259,7 +259,7 @@ __interrupt void claDefaultTask(void)
 
 void CLA_LLC_V_Loop_Routine(void)
 {
-    claVoltLoop.member.reference = CPU_Vout_Ref;
+    claVoltLoop.member.reference = 13226;//CPU_Vout_Ref
 
     if (claDuty.sotcFlag == 0)
     {

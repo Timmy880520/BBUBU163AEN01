@@ -85,12 +85,12 @@ History:
 
 // Model name
 #ifndef Model_Name
-#define Model_Name              "BBUBU173AA901"
+#define Model_Name              "BBUBU163AEN01"
 #endif
 
 // Compliant model name
 #define Compliant_Model         {\
-                                    "BBUBU173AA901",\
+                                    "BBUBU163AEN01",\
                                 }
 
 // Type code
@@ -105,7 +105,7 @@ History:
 
 // App version
 #ifndef App_Version
-#define App_Version             "S1.00B052"
+#define App_Version             "S1.00B09"
 #endif
 
 #ifndef Sub_Version

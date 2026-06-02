@@ -310,7 +310,7 @@ int main(void)
 {
     Initial();      // ~700us
     Clean_WarningCode_Status();
-    workingState = CHARGER_MODE;//POWERON_MODE
+    workingState = DISCHARGER_MODE;//POWERON_MODE
     flagPowerOn = false;
 
     DACA_VAL(0);
