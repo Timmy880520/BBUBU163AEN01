@@ -259,7 +259,7 @@ __interrupt void claDefaultTask(void)
 
 void CLA_LLC_V_Loop_Routine(void)
 {
-    claVoltLoop.member.reference = 13226;//CPU_Vout_Ref
+    claVoltLoop.member.reference = 4397;//CPU_Vout_Ref
 
     if (claDuty.sotcFlag == 0)
     {
