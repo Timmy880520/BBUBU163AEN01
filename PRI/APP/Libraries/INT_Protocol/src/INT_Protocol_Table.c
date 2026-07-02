@@ -220,7 +220,7 @@ DataPackStr bmsDataPacket[] =
     {&bmsData.stateOfCharge,         2},
     {&bmsData.stateOfHealth,         2},
     {&bmsData.remainingBattCapcity,  2},
-    {&bmsData.packFanTach,           2},
+//    {&bmsData.packFanTach,           2},
 };
 
 DataPackStr bbuStatusPacket[] =

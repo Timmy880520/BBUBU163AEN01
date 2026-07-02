@@ -81,7 +81,7 @@ EventLogType eventLogTable[Log_Table_Size] =
     {&bmsData.remainingBattCapcity,  2},
     //Event log data2 26
     {&avgCurrShareVolt.val,          2},
-    {&bmsData.packFanTach,           2},
+//    {&bmsData.packFanTach,           2},
     //Event log data3 4
     //74
 };

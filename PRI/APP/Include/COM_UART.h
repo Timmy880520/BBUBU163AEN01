@@ -183,7 +183,7 @@ typedef struct
     unsigned short stateOfCharge;
     unsigned short stateOfHealth;
     unsigned short remainingBattCapcity;
-    unsigned short packFanTach;
+//    unsigned short packFanTach;
 }BmsDataType;
 
 typedef union
@@ -377,7 +377,7 @@ typedef union
     {
         unsigned short cFetEnable            :1;
         unsigned short dFetEnable            :1;
-        unsigned short reserved0             :1;
+        unsigned short PredFetEnable         :1;
         unsigned short reserved1             :1;
         unsigned short reserved2             :1;
         unsigned short reserved3             :1;

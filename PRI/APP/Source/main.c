@@ -786,21 +786,21 @@ void Precharge_Procedure(void)
             countDelayprecharge2 = 0;
             countDelayprecharge3 = 0;
             prechargeDone = 0;
-            powerOnStateCheck = STATE_BYPASS_RLY2;
+            powerOnStateCheck = STATE_BYPASS_RLY1;
             break;
         }
-        case STATE_BYPASS_RLY2:
-        {
-            if (++countDelayprecharge1 >= COUNT_700ms_IN_2kHz)
-            {
-                Bypass_PRECHG2_RLY();
-                powerOnStateCheck = STATE_BYPASS_RLY1;
-            }
-            break;
-        }
+//        case STATE_BYPASS_RLY2:
+//        {
+//            if (++countDelayprecharge1 >= COUNT_700ms_IN_2kHz)
+//            {
+//                Bypass_PRECHG2_RLY();
+//                powerOnStateCheck = STATE_BYPASS_RLY1;
+//            }
+//            break;
+//        }
         case STATE_BYPASS_RLY1:
         {
-            if (++countDelayprecharge1 >= COUNT_800ms_IN_2kHz)
+            if (++countDelayprecharge1 >= COUNT_5s_IN_2kHz)
             {
                 Bypass_PRECHG1_RLY();
                 targetVolt = OUTPUT_VOLT_BATT(0.1*(float)avgBattVolt.val);
