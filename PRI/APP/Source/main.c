@@ -205,6 +205,7 @@ unsigned char prechargeDone = 0;
 static unsigned short countDelayprecharge1 = 0;
 static unsigned short countDelayprecharge2 = 0;
 static unsigned short countDelayprecharge3 = 0;
+static unsigned short countDelayprecharge4 = 0;
 
 unsigned short chargerSoftstart = 0;
 unsigned short chargerSoftstartFlag = 0;
@@ -785,19 +786,11 @@ void Precharge_Procedure(void)
             countDelayprecharge1 = 0;
             countDelayprecharge2 = 0;
             countDelayprecharge3 = 0;
+            countDelayprecharge4 = 0;
             prechargeDone = 0;
             powerOnStateCheck = STATE_BYPASS_RLY1;
             break;
         }
-//        case STATE_BYPASS_RLY2:
-//        {
-//            if (++countDelayprecharge1 >= COUNT_700ms_IN_2kHz)
-//            {
-//                Bypass_PRECHG2_RLY();
-//                powerOnStateCheck = STATE_BYPASS_RLY1;
-//            }
-//            break;
-//        }
         case STATE_BYPASS_RLY1:
         {
             if (++countDelayprecharge1 >= COUNT_5s_IN_2kHz)
@@ -844,11 +837,24 @@ void Precharge_Procedure(void)
             if (ahbVoltReference >= targetVolt)
             {
                 ahbVoltReference = targetVolt;
-                powerOnStateCheck = STATE_CHECK_FOR_D_FET;
+                powerOnStateCheck = STATE_CHECK_FOR_Pd_FET;
             }
 
             Set_Ahb_Mode(AHB_CV_MODE);
             CHG_Driver_Enable();
+            break;
+        }
+        case STATE_CHECK_FOR_Pd_FET:
+        {
+            Set_Ahb_Mode(AHB_OFF_MODE);
+            CHG_Driver_Disable();
+            bmsFetControl.bit.PredFetEnable = 1;
+            sciProtocol.func.packTxData(&sciProtocol, 0xC6, INTERNAL_SET, LOW_PRIORITY);
+
+            if (++countDelayprecharge4 >= COUNT_5s_IN_2kHz)
+            {
+                powerOnStateCheck = STATE_CHECK_FOR_D_FET; //7
+            }
             break;
         }
         case STATE_CHECK_FOR_D_FET:
