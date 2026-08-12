@@ -297,6 +297,11 @@ CpuUsageType cpuTimer1Task = {0ul, 0.0f};
 LlcStateType cpuLlcState = {0};
 AhbStateType cpuAhbState = {0};
 BbuItemType bbuItem = {0};
+
+uint16_t debug1 = 0;
+uint16_t debug2 = 0;
+uint16_t debug3 = 0;
+uint16_t debug4 = 0;
 /***************************************************************************************************
 Function Name:
     int main(void)
@@ -311,7 +316,7 @@ int main(void)
 {
     Initial();      // ~700us
     Clean_WarningCode_Status();
-    workingState = DISCHARGER_MODE;//POWERON_MODE
+    workingState = POWERON_MODE;//POWERON_MODE
     flagPowerOn = false;
 
     DACA_VAL(0);
@@ -409,10 +414,15 @@ void State_Machine(void)
             countPowerOn = 0;
             flagPowerOn = true;
             Bypass_AUX_RLY();
-            workingState = SLEEP_MODE;
+//            workingState = SLEEP_MODE;
+            countSleep = 0;
+//            workingState = PRECHARGE_MODE;
+            workingState = DISCHARGER_SOFTSTART_MODE;
+            powerOnStateCheck = STATE_PRECHG_INIT;
+
         }
 
-        dcdcState.bit.bbukill = warningCode.status2.bit.bbuKill;
+//        dcdcState.bit.bbukill = warningCode.status2.bit.bbuKill;
         break;
 
     case SLEEP_MODE:
@@ -447,11 +457,12 @@ void State_Machine(void)
             {
                 countDelayprecharge3 = 0;
 
-                if (sciProtocol.func.getNoAckFlag(&sciProtocol, 0xC6) == 1)
-                {
+//                if (sciProtocol.func.getNoAckFlag(&sciProtocol, 0xC6) == 1)
+//                {
                     sciProtocol.func.packTxData(&sciProtocol, 0xC6, INTERNAL_SET, LOW_PRIORITY);
-                }
-                else if (bbuItem.flag.dFet)
+//                }
+//                else if (bbuItem.flag.dFet)
+                if (bmsFetControl.bit.dFetEnable)
                 {
                     workingState = STANDBY_MODE;
                     prechargeDone = 0;
@@ -464,34 +475,35 @@ void State_Machine(void)
     case STANDBY_MODE:
         dcdcState.bit.standbyOK = true;
 
-        if (warningCode.status2.bit.FAILOUT)
-        {
-            BBU_Fault();
-            workingState = LATCH_MODE;
-        }
-        else if (!warningCode.status2.bit.bbuKill || bbuItem.flag.dFet == 0)
-        {
-            workingState = SLEEP_MODE;
-        }
-        else if ((dcdcState.bit.acLoss   || warningCode.status2.bit.SYNC_START || (forceDischarge == 0xDC) || ((learningMode == 0x01) && warningCode.status2.bit.sohOut)) \
-              && (warningCode.flag.bit.vBattUvFault == 0))
-        {
-            if ((learningMode == 0x01) && warningCode.status2.bit.sohOut)
-            {
-                sohOutFlag = 1;
-                sohOutChgFlag = 1;
-                learningCycle.all = 0;
-                cpuLlcState.bit.sohOutFlag = 1;
-                Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT + outputVoltSetpointOffset - 100); //394V
-            }
-
-            Turn_On_Procedure();
-        }
-        else if ((warningCode.flag.bit.chgOTP == 0)         && (warningCode.flag.bit.chgOTW == 0)                && (warningCode.flag.bit.AMB_OTP == 0)        && (warningCode.flag.bit.AMB_OTW == 0) \
-              && (warningCode.flag.bit.fan1FrontFault == 0) && (warningCode.flag.bit.fan1RearFault == 0)         && (warningCode.flag.bit.fan2FrontFault == 0) && (warningCode.flag.bit.fan2RearFault == 0) \
-              && (dcdcState.bit.acLoss == 0)                && (avgOutputVolt.cma > (OUTPUT_VOLT_BUS(350) >> 2)) && warningCode.status2.bit.chgEnOut)
-        {
-            if (bbuItem.flag.cFet == 0)
+//        if (warningCode.status2.bit.FAILOUT)
+//        {
+//            BBU_Fault();
+//            workingState = LATCH_MODE;
+//        }
+//        else if (!warningCode.status2.bit.bbuKill || bbuItem.flag.dFet == 0)
+//        {
+//            workingState = SLEEP_MODE;
+//        }
+//        else if ((dcdcState.bit.acLoss   || warningCode.status2.bit.SYNC_START || (forceDischarge == 0xDC) || ((learningMode == 0x01) && warningCode.status2.bit.sohOut)) \
+//              && (warningCode.flag.bit.vBattUvFault == 0))
+//        {
+//            if ((learningMode == 0x01) && warningCode.status2.bit.sohOut)
+//            {
+//                sohOutFlag = 1;
+//                sohOutChgFlag = 1;
+//                learningCycle.all = 0;
+//                cpuLlcState.bit.sohOutFlag = 1;
+//                Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT + outputVoltSetpointOffset - 100); //394V
+//            }
+//
+//            Turn_On_Procedure();
+//        }
+//        else if ((warningCode.flag.bit.chgOTP == 0)         && (warningCode.flag.bit.chgOTW == 0)                && (warningCode.flag.bit.AMB_OTP == 0)        && (warningCode.flag.bit.AMB_OTW == 0) \
+//              && (warningCode.flag.bit.fan1FrontFault == 0) && (warningCode.flag.bit.fan1RearFault == 0)         && (warningCode.flag.bit.fan2FrontFault == 0) && (warningCode.flag.bit.fan2RearFault == 0) \
+//              && (dcdcState.bit.acLoss == 0)                && (avgOutputVolt.cma > (OUTPUT_VOLT_BUS(350) >> 2)) && warningCode.status2.bit.chgEnOut)
+//        {
+//            if (bbuItem.flag.cFet == 0)
+            if(bmsFetControl.bit.cFetEnable == 0)
             {
                 Precharge_Procedure();
             }
@@ -506,14 +518,15 @@ void State_Machine(void)
                 {
                     countDelayprecharge3 = 0;
 
-                    if (sciProtocol.func.getNoAckFlag(&sciProtocol, 0xC6) == 1)
-                    {
+//                    if (sciProtocol.func.getNoAckFlag(&sciProtocol, 0xC6) == 1)
+//                    {
                         sciProtocol.func.packTxData(&sciProtocol, 0xC6, INTERNAL_SET, LOW_PRIORITY);
-                    }
-                    else if (bbuItem.flag.cFet == 1)
+//                    }
+//                    else if (bbuItem.flag.cFet == 1)
+                    if (bmsFetControl.bit.cFetEnable == 1)
                     {
                         bmsCurrentOffset = 0;
-                        ahbVoltSetpoint = ((OUTPUT_VOLT_BATT(DEFAULT_CHARGE_VOLT + chargeVoltSetpointOffset)) * __IQ(0.1, 14)) >> 14; // OUTPUT_VOLT_BATT(304) = 13320
+                        ahbVoltSetpoint = ((OUTPUT_VOLT_BATT(DEFAULT_CHARGE_VOLT)) * __IQ(0.1, 14)) >> 14; // OUTPUT_VOLT_BATT(304) = 13320  + chargeVoltSetpointOffset
                         ahbVoltReference = adcChargeVolt << 2;
                         chargerSoftstart = 1;
                         countAhbTurnOff = 0;
@@ -523,11 +536,13 @@ void State_Machine(void)
                     }
                 }
             }
-        }
+//        }
         break;
 
     case DISCHARGER_SOFTSTART_MODE:
-        Turn_Off_Procedure();
+//        Turn_Off_Procedure();
+        Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT); //not here
+        Turn_On_Procedure();//not here
         LLC_Driver_Enable();
         softstartFlag = 1;
 
@@ -537,7 +552,7 @@ void State_Machine(void)
             softstartFlag = 0;
             flagSrTurnOn = false;
             delaySrTurnOn = COUNT_100ms_IN_2kHz;
-            workingState = DISCHARGER_MODE;
+//            workingState = DISCHARGER_MODE;
         }
         break;
 
@@ -626,27 +641,27 @@ void State_Machine(void)
 //                Sr_Pwm_Off();
 //            }
 //        }
-        if(BBU_Kill())
-        {
-            Set_Llc_Mode(LLC_ON_MODE);
-            LLC_Driver_Enable();
-            Oring_On();
-            SR_Driver_Disable();
-            Sr_Pwm_Off();
-        }
-        if(NON_BBU_Kill())
-        {
-            Set_Llc_Mode(LLC_OFF_MODE);
-            LLC_Driver_Disable();
-            Oring_Off();
-            SR_Driver_Disable();
-            Sr_Pwm_Off();
-        }
+//        if(BBU_Kill())
+//        {
+//            Set_Llc_Mode(LLC_ON_MODE);
+//            LLC_Driver_Enable();
+//            Oring_On();
+//            SR_Driver_Disable();
+//            Sr_Pwm_Off();
+//        }
+//        if(NON_BBU_Kill())
+//        {
+//            Set_Llc_Mode(LLC_OFF_MODE);
+//            LLC_Driver_Disable();
+//            Oring_Off();
+//            SR_Driver_Disable();
+//            Sr_Pwm_Off();
+//        }
         break;
 
     case CHARGER_MODE:
-//        dcdcState.bit.chargerOK = true;
-//
+        dcdcState.bit.chargerOK = true;
+
 //        if (warningCode.status2.bit.ESTOP1   || warningCode.status2.bit.ESTOP2   || warningCode.flag.bit.vBattOvFault      || warningCode.flag.bit.iChargeOcFault \
 //        ||  warningCode.flag.bit.vOutUvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || warningCode.status2.bit.FAILOUT)
 //        {
@@ -689,31 +704,31 @@ void State_Machine(void)
 //        }
 //        else
 //        {
-//            if (chargerSoftstart)
-//            {
-//                ahbCurrChgDone = 0;
-//                Set_Ahb_Mode(AHB_CC_MODE);
-//                CHG_Driver_Enable();
-//                chargerSoftstart = 0;
-//                chargerSoftstartFlag = 1;
-//            }
-//
-//            if (!CurrsoftstartDone)
-//            {
-//                ahbCurrChgDone = 1;
-//                chargerSoftstartFlag = 0;
-//                Set_Ahb_Mode(AHB_ON_MODE);
-//                ahbVoltReference += 2;
-//                if (ahbVoltReference >= ahbVoltSetpoint)
-//                {
-//                    ahbVoltReference = ahbVoltSetpoint; // ahbVoltSetpoint = 13342
-//                    ahbVoltChgDone = 1;
-//                    CurrsoftstartDone = 1;
-//                }
-//            }
+            if (chargerSoftstart)
+            {
+                ahbCurrChgDone = 0;
+                Set_Ahb_Mode(AHB_CC_MODE);
+                CHG_Driver_Enable();
+                chargerSoftstart = 0;
+                chargerSoftstartFlag = 1;
+            }
+
+            if (!CurrsoftstartDone)
+            {
+                ahbCurrChgDone = 1;
+                chargerSoftstartFlag = 0;
+                Set_Ahb_Mode(AHB_ON_MODE);
+                ahbVoltReference += 2;
+                if (ahbVoltReference >= ahbVoltSetpoint)
+                {
+                    ahbVoltReference = ahbVoltSetpoint; // ahbVoltSetpoint = 13342
+                    ahbVoltChgDone = 1;
+                    CurrsoftstartDone = 1;
+                }
+            }
 //        }
-        Set_Ahb_Mode(AHB_ON_MODE);
-        CHG_Driver_Enable();
+//        Set_Ahb_Mode(AHB_ON_MODE);
+//        CHG_Driver_Enable();
         break;
 
     case LATCH_MODE:
@@ -760,24 +775,24 @@ Comment:
 **************************************************************************************************/
 void Precharge_Procedure(void)
 {
-    if (warningCode.status2.bit.ESTOP1   || warningCode.status2.bit.ESTOP2   || warningCode.flag.bit.vBattOvFault      || warningCode.flag.bit.iChargeOcFault \
-    ||  warningCode.flag.bit.vOutUvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || warningCode.status2.bit.FAILOUT)
-    {
-        Warning_Storage();
-
-        powerOnStateCheck = STATE_FAULT;
-
-        if (++countAhbTurnOff > COUNT_200ms_IN_2kHz)
-        {
-            countAhbTurnOff = 0;
-            CHG_Driver_Disable();
-            Set_Ahb_Mode(AHB_OFF_MODE);
-            workingState = LATCH_MODE;
-        }
-
-        if (warningCode.status2.bit.FAILOUT)
-            BBU_Fault();
-    }
+//    if (warningCode.status2.bit.ESTOP1   || warningCode.status2.bit.ESTOP2   || warningCode.flag.bit.vBattOvFault      || warningCode.flag.bit.iChargeOcFault \
+//    ||  warningCode.flag.bit.vOutUvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || warningCode.status2.bit.FAILOUT)
+//    {
+//        Warning_Storage();
+//
+//        powerOnStateCheck = STATE_FAULT;
+//
+//        if (++countAhbTurnOff > COUNT_200ms_IN_2kHz)
+//        {
+//            countAhbTurnOff = 0;
+//            CHG_Driver_Disable();
+//            Set_Ahb_Mode(AHB_OFF_MODE);
+//            workingState = LATCH_MODE;
+//        }
+//
+//        if (warningCode.status2.bit.FAILOUT)
+//            BBU_Fault();
+//    }
 
     switch (powerOnStateCheck)
     {
@@ -813,7 +828,8 @@ void Precharge_Procedure(void)
                     Bypass_BATT_RLY();
                     CHG_Driver_Disable();
                     Set_Ahb_Mode(AHB_OFF_MODE);
-                    targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
+//                    targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
+                    targetVolt = OUTPUT_VOLT_BATT(217);
                     powerOnStateCheck = STATE_PRECHG_CHG_OUTPUT;
                 }
             }
@@ -859,8 +875,8 @@ void Precharge_Procedure(void)
         }
         case STATE_CHECK_FOR_D_FET:
         {
-            if (avgBattVolt.val >= (bmsData.battOverallVolt - 50)) //Unit 0.1V
-            {
+//            if (avgBattVolt.val >= (bmsData.battOverallVolt - 50)) //Unit 0.1V
+//            {
                 powerOnStateCheck = STATE_COMPLETED; //7
                 Turnoff_BATT_RLY();
                 Set_Ahb_Mode(AHB_OFF_MODE);
@@ -869,13 +885,14 @@ void Precharge_Procedure(void)
                 bmsFetControl.bit.dFetEnable = 1;
                 sciProtocol.func.packTxData(&sciProtocol, 0xC6, INTERNAL_SET, LOW_PRIORITY);
                 prechargeDone = 1;
-            }
+//            }
             break;
         }
         case STATE_CHECK_VOLTAGE: //8
         {
             ahbVoltReference = OUTPUT_VOLT_BATT(0.1*(float)avgChargeVolt.val);
-            targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
+//            targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
+            targetVolt = OUTPUT_VOLT_BATT(217);
             powerOnStateCheck = STATE_PRECHG_CHG_CAP;
             break;
         }
@@ -921,16 +938,16 @@ Comment:
 **************************************************************************************************/
 void Turn_On_Procedure(void)
 {
-#if (OpenLoop)
-//    if(BULK_OK() && (flagPsKill == false))
-    if(warningCode.status2.bit.bbuKill == 1)
-#else
-    if ((warningCode.status2.bit.bbuKill == 1)    && (warningCode.flag.bit.srOTP == 0)          && (warningCode.flag.bit.srOTW == 0)         && (warningCode.flag.bit.oringOTP == 0) \
-    &&  (warningCode.flag.bit.oringOTW == 0)      && (warningCode.flag.bit.dchgOTP == 0)        && (warningCode.flag.bit.dchgOTW == 0)       && (warningCode.flag.bit.AMB_OTP == 0) \
-    &&  (warningCode.flag.bit.AMB_OTW == 0)       && (warningCode.flag.bit.fan1FrontFault == 0) && (warningCode.flag.bit.fan1RearFault == 0) && (warningCode.flag.bit.fan2FrontFault == 0) \
-    &&  (warningCode.flag.bit.fan2RearFault == 0) && (warningCode.status2.bit.ESTOP1 == 0)      && (warningCode.status2.bit.ESTOP2 == 0))
-#endif
-    {
+//#if (OpenLoop)
+////    if(BULK_OK() && (flagPsKill == false))
+//    if(warningCode.status2.bit.bbuKill == 1)
+//#else
+//    if ((warningCode.status2.bit.bbuKill == 1)    && (warningCode.flag.bit.srOTP == 0)          && (warningCode.flag.bit.srOTW == 0)         && (warningCode.flag.bit.oringOTP == 0) \
+//    &&  (warningCode.flag.bit.oringOTW == 0)      && (warningCode.flag.bit.dchgOTP == 0)        && (warningCode.flag.bit.dchgOTW == 0)       && (warningCode.flag.bit.AMB_OTP == 0) \
+//    &&  (warningCode.flag.bit.AMB_OTW == 0)       && (warningCode.flag.bit.fan1FrontFault == 0) && (warningCode.flag.bit.fan1RearFault == 0) && (warningCode.flag.bit.fan2FrontFault == 0) \
+//    &&  (warningCode.flag.bit.fan2RearFault == 0) && (warningCode.status2.bit.ESTOP1 == 0)      && (warningCode.status2.bit.ESTOP2 == 0))
+//#endif
+//    {
         //reset turn off counter
         highLimitFreq = 0;
         countLlcTurnOff = 0;
@@ -940,7 +957,7 @@ void Turn_On_Procedure(void)
         Clean_WarningCode_Status();
 //        Clear_WarningCode_State(0x55AA);
         workingState = DISCHARGER_SOFTSTART_MODE;
-    }
+//    }
 }
 /**************************************************************************************************
 Function Name:

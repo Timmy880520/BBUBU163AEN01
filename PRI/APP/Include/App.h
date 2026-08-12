@@ -105,7 +105,7 @@ History:
 
 // App version
 #ifndef App_Version
-#define App_Version             "S1.00B09"
+#define App_Version             "S5.00B09"
 #endif
 
 #ifndef Sub_Version
@@ -570,5 +570,10 @@ extern BbuItemType bbuItem;
 extern LlcFloatPiControlType sohCurrLoop;
 
 extern TmrPkg dischargerOperationTimer;
+
+extern uint16_t debug1;
+extern uint16_t debug2;
+extern uint16_t debug3;
+extern uint16_t debug4;
 //----------------------------------------------------------------------------------------------------------------------
 #endif /* _APP_H_ */

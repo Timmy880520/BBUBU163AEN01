@@ -131,13 +131,13 @@
 #define Default_AHB_V_PI_KI     0.01*0.059f
 #define Default_AHB_V_PI_KC     (Default_AHB_V_PI_KI/Default_AHB_V_PI_KP) //(Ki/Kp)
 #define Default_AHB_V_PI_KA     1.0f
-#define Default_AHB_V_PI_Limit  600.0f*0.6 //TBPRD = 600
+#define Default_AHB_V_PI_Limit  400.0f*0.6 //TBPRD = 600
 
 #define Default_AHB_I_PI_KP     0.01*0.241f
 #define Default_AHB_I_PI_KI     0.01*0.001f
 #define Default_AHB_I_PI_KC     (Default_AHB_I_PI_KI/Default_AHB_I_PI_KP) //(Ki/Kp)
 #define Default_AHB_I_PI_KA     1.0f
-#define Default_AHB_I_PI_Limit  600.0f*0.6 //TBPRD = 600
+#define Default_AHB_I_PI_Limit  400.0f*0.6 //TBPRD = 600
 
 /* Type definitions */
 // Structure & union

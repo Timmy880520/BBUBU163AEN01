@@ -32,6 +32,15 @@ History:
 /* Data definitions */
 // Command packet data
 
+DataPackStr debugDataPacket[] =
+{
+    {&debug1,                   2},
+    {&debug2,                   2},
+    {&debug3,                   2},
+    {&debug4,                   2},
+};
+
+
 DataPackStr dcdcDataPacket[] =
 {
     {&avgBattVolt.val1,                     2},
@@ -266,6 +275,7 @@ DataPackStr LearningModePacket[] =
 Create_INT_Command(intPage0Command, 32, 256) =
 {
 //  flag,        code,              data type,     data pointer,                            data size(Byte)
+    {GETTABLE,   0xA0,              DATA_PACKET,   debugDataPacket,                         sizeof(debugDataPacket)},
     {GETTABLE,   0xC0,              DATA_PACKET,   dcdcDataPacket,                          sizeof(dcdcDataPacket)},
     {GETTABLE,   0xC1,              DATA_PACKET,   dcdcStatusPacket,                        sizeof(dcdcStatusPacket)},
     {SETTABLE,   0xC2,              DATA_PACKET,   comDataPacket,                           sizeof(comDataPacket)},

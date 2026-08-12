@@ -92,11 +92,11 @@ Uint16 ahbSoftStartFlag;
 
 __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
 {
-    if (claLlcState.bit.softStart == 0)
+//    if (claLlcState.bit.softStart == 0)
         CLA_ADC_VOUT = AdcbResultRegs.ADCRESULT1; // AdcbResultRegs.ADCRESULT1; ADC_VO_COMP
-    else
-        CLA_ADC_VOUT = AdccResultRegs.ADCRESULT0; // AdccResultRegs.ADCRESULT0; ADC_VO_ORING
-
+//    else
+//        CLA_ADC_VOUT = AdccResultRegs.ADCRESULT0; // AdccResultRegs.ADCRESULT0; ADC_VO_ORING
+        DACA_VAL(CLA_ADC_VOUT);
 //    CLA_ADC_VOUT = AdccResultRegs.ADCRESULT0 * claLlcState.bit.softStart + AdcbResultRegs.ADCRESULT1 * (!claLlcState.bit.softStart);
 
     CLA_ADC_IOUT = AdcaResultRegs.ADCRESULT1;
@@ -114,88 +114,36 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
 
     switch(claMode)
     {
-        case MODE_CHARGE:
-            CLA_AHB_I_Loop_Routine();
-            CLA_AHB_V_Loop_Routine();
-            ahbPeriodiloop = (long)ahbCurrLoop.output;
-            ahbPeriodvloop = (long)ahbVoltLoop.output;
+    case MODE_CHARGE:
+        CLA_AHB_I_Loop_Routine();
+        CLA_AHB_V_Loop_Routine();
+        ahbPeriodiloop = (long)ahbCurrLoop.output;
+        ahbPeriodvloop = (long)ahbVoltLoop.output;
 
-////            if(claAhbState.bit.ccEnableDrive && !claAhbState.bit.cvEnableDrive)
-////                ahbPeriod = ahbPeriodiloop;
-////            else if (claAhbState.bit.cvEnableDrive && !claAhbState.bit.ccEnableDrive)
-////                ahbPeriod = ahbPeriodvloop;
-////            else
-////            {
-//                if (ahbPeriodiloop < ahbPeriodvloop)
-//                    ahbPeriod = ahbPeriodiloop;
-//                else
-//                    ahbPeriod = ahbPeriodvloop;
-////            }
+        if(claAhbState.bit.ccEnableDrive && !claAhbState.bit.cvEnableDrive)
+            ahbPeriod = ahbPeriodiloop;
+        else if (claAhbState.bit.cvEnableDrive && !claAhbState.bit.ccEnableDrive)
+            ahbPeriod = ahbPeriodvloop;
+        else
+        {
+            if (ahbPeriodiloop < ahbPeriodvloop)
+                ahbPeriod = ahbPeriodiloop;
+            else
+                ahbPeriod = ahbPeriodvloop;
+        }
 
-                if (ahbPeriodiloop < ahbPeriodvloop)
-                    ahbPeriodCmd = ahbPeriodiloop;
-                else
-                    ahbPeriodCmd = ahbPeriodvloop;
-            #if (AHBTestMode)
-                    EPwm6Regs.CMPA.bit.CMPA = ahbTestPeriod;
-            #else
-//                    if(ahbPeriod > 240)
-//                        ahbPeriod = 240;
-//                    if(ahbPeriod < 40)
-//                        ahbPeriod = 40;
-                    if(ahbPeriodCmd > AHB_PERIOD_MAX)
-                        ahbPeriodCmd = AHB_PERIOD_MAX;
-                    if(ahbPeriodCmd < AHB_PERIOD_MIN)
-                        ahbPeriodCmd = AHB_PERIOD_MIN;
-
-                    if((ahbPeriod == AHB_PERIOD_MIN) &&
-                       (ahbPeriodCmd > AHB_PERIOD_MIN) &&
-                       (!ahbSoftStartFlag))
-                    {
-                        ahbSoftStartFlag = 1;
-                    }
-
-                    if(ahbSoftStartFlag)
-                    {
-                        // restart soft start mode
-
-                        ahbPeriod += AHB_PERIOD_STEP_UP;
-
-                        if(ahbPeriod >= ahbPeriodCmd)
-                        {
-                            ahbPeriod = ahbPeriodCmd;
-                            ahbSoftStartFlag = 0;
-                        }
-                    }
-                    else
-                    {
-                        // normal slew limiter
-
-                        if(ahbPeriod < ahbPeriodCmd)
-                        {
-                            ahbPeriod += AHB_PERIOD_STEP_UP;
-
-                            if(ahbPeriod > ahbPeriodCmd)
-                                ahbPeriod = ahbPeriodCmd;
-                        }
-                        else if(ahbPeriod > ahbPeriodCmd)
-                        {
-                            ahbPeriod -= AHB_PERIOD_STEP_DOWN;
-
-                            if(ahbPeriod < ahbPeriodCmd)
-                                ahbPeriod = ahbPeriodCmd;
-                        }
-                    }
-
-                    EPwm6Regs.CMPA.bit.CMPA = ahbPeriod;
-            #endif
-            break;
+        #if (AHBTestMode)
+                EPwm6Regs.CMPA.bit.CMPA = ahbTestPeriod;
+        #else
+                EPwm6Regs.CMPA.bit.CMPA = ahbPeriod;
+        #endif
+        break;
 
         case MODE_DISCHARGE:
             if(claLlcState.bit.enableDrive == 1)
             {
                 if (!claLlcState.bit.sotcEngineerFlag)
-                    CLA_SOTCPACK();
+//                    CLA_SOTCPACK();
 
                 CLA_LLC_V_Loop_Routine();
 
@@ -211,18 +159,18 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
             }
 
             CLA_Llc_Pwm_Table();
-            CLA_Burst_Mode_Controller();
+//            CLA_Burst_Mode_Controller();
 
-            if ((claLlcState.bit.burst || claBurstFlag) && ((CLA_ADC_VOUT >= 3432) || (claLlcState.bit.sohOutFlag && CLA_ADC_VOUT >= 3410))) //3432 / 4095 * 472.478 = 395.98V //3410 / 4095 * 472.478 = 393.44V
-            {
-                claDuty.priDeadband = 0x2000; //0x3FFF;
-                claDuty.srDeadband = 0x2000; //0xFFFF;
-            }
-            else
-            {
+//            if ((claLlcState.bit.burst || claBurstFlag) && ((CLA_ADC_VOUT >= 3432) || (claLlcState.bit.sohOutFlag && CLA_ADC_VOUT >= 3410))) //3432 / 4095 * 472.478 = 395.98V //3410 / 4095 * 472.478 = 393.44V
+//            {
+//                claDuty.priDeadband = 0x2000; //0x3FFF;
+//                claDuty.srDeadband = 0x2000; //0xFFFF;
+//            }
+//            else
+//            {
                 claDuty.priDeadband = 30;
                 claDuty.srDeadband = 30;
-            }
+//            }
 
             #if (FixFreq && LLCTestMode)
                 //claDuty.period = 230; //260kHz
@@ -232,7 +180,7 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
 
             #endif
 
-            CLA_Region_SR_Controller();
+//            CLA_Region_SR_Controller();
 
             if (EPwm4Regs.TBSTS.bit.SYNCI)
             {
@@ -242,7 +190,6 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
             break;
 
         case MODE_DEFAULT:
-
             CLA_LLC_V_Loop_Reset();
             CLA_AHB_Loop_Reset();
             EPwm6Regs.CMPA.bit.CMPA = ahbPeriod;
@@ -259,7 +206,7 @@ __interrupt void claDefaultTask(void)
 
 void CLA_LLC_V_Loop_Routine(void)
 {
-    claVoltLoop.member.reference = 4397;//CPU_Vout_Ref
+    claVoltLoop.member.reference = CPU_Vout_Ref;//CPU_Vout_Ref
 
     if (claDuty.sotcFlag == 0)
     {
@@ -285,7 +232,6 @@ void CLA_LLC_V_Loop_Routine(void)
         claVoltLoop.member.piControl.iYn   = Default_CLA_Type_III_PI_KI * claVoltLoop.member.piControl.error;
         claVoltLoop.member.piControl.iYn  += claVoltLoop.member.piControl.iYn1;
         claVoltLoop.member.piControl.iYn  += Default_CLA_Type_III_PI_KC * claVoltLoop.member.piControl.satError;
-
         claVoltLoop.member.piControl.iYn1 = claVoltLoop.member.piControl.iYn;
         claVoltLoop.member.piControl.piYn = claVoltLoop.member.piControl.pYn + claVoltLoop.member.piControl.iYn;
 
@@ -780,8 +726,8 @@ void CLA_SOTCPACK(void)
 
 void CLA_AHB_V_Loop_Routine(void)
 {
-    ahbVoltLoop.error =  (float)(11008 - CPU_AHB_Vout);
-//    ahbVoltLoop.error =  (float)(CPU_VCharge_Ref - CPU_AHB_Vout);
+//    ahbVoltLoop.error =  (float)(1402 - CPU_AHB_Vout);
+    ahbVoltLoop.error =  (float)(CPU_VCharge_Ref - CPU_AHB_Vout);
     ahbVoltLoop.pYn = ahbVoltLoop.kp * ahbVoltLoop.error;
     ahbVoltLoop.iYn = ahbVoltLoop.ki * ahbVoltLoop.error;
     ahbVoltLoop.iYn += ahbVoltLoop.iYn1;
@@ -802,8 +748,8 @@ void CLA_AHB_V_Loop_Routine(void)
 
 void CLA_AHB_I_Loop_Routine(void)
 {
-    ahbCurrLoop.error = (float)(2240 - CPU_AHB_Iout);
-//    ahbCurrLoop.error = (float)(CPU_ICharge_Ref - CPU_AHB_Iout);
+//    ahbCurrLoop.error = (float)(2240 - CPU_AHB_Iout);
+    ahbCurrLoop.error = (float)(CPU_ICharge_Ref - CPU_AHB_Iout);
     ahbCurrLoop.pYn = ahbCurrLoop.kp * ahbCurrLoop.error;
     ahbCurrLoop.iYn = ahbCurrLoop.ki * ahbCurrLoop.error;
     ahbCurrLoop.iYn += ahbCurrLoop.iYn1;

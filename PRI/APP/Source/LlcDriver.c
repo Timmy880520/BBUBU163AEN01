@@ -936,16 +936,16 @@ void LlcController(void)
         }
 
         if (!softstartDone && sohOutFlag == 1)
-            sTemp = voltSetpoint + sohTestVolRefOffset;
+            sTemp = voltSetpoint;// + sohTestVolRefOffset;
         else if (!softstartDone)
-            sTemp = voltSetpoint + droopVoltRefOffset + csVoltRefOffset;
+            sTemp = voltSetpoint;// + droopVoltRefOffset + csVoltRefOffset;
         else
             sTemp = voltSoftStartRef;
 
         if (sTemp < 0)
             sTemp = 0;
-        else if (sTemp > 15605) //New add 450V 15605 //450V 9909
-            sTemp = 15605;
+        else if (sTemp > 13226) //New add 450V 15605 //800V 13226
+            sTemp = 13226;
 
         llcVoltParam.reference = (long)sTemp;
 
@@ -962,7 +962,7 @@ void LlcController(void)
         CPU_LLC_Vout = llcVoltParam.feedback;
 
         //FROM CLA
-        if(llcVoltParam.feedback > OUTPUT_VOLT_BUS(20.0))    //OUTPUT_VOLT_BUS(3.7)
+        if(llcVoltParam.feedback > OUTPUT_VOLT_BUS(0.0))    //OUTPUT_VOLT_BUS(20.0)
         {
             openFlag = 1;
             cpuLlcState.bit.enableDrive = 1;
@@ -1153,7 +1153,7 @@ void Set_Voltage_Setpoint(unsigned long volt)
     unsigned long divisor;
     unsigned long remainder;
 
-    volt = __IQsat(volt, 4500, 0);//450V
+    volt = __IQsat(volt, 9910, 0);//991V
     voltSetpoint = ((OUTPUT_VOLT_BUS(volt)) * __IQ(0.1, 14)) >> 14;
 
     voltSoftStartSetpoint1 = ((voltSetpoint * __IQ(0.9, 14)) >> 14);

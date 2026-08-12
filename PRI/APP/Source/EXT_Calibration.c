@@ -135,14 +135,14 @@ void Reload_Ext_Calibration_Data(void)
     temp = ((float)llcCalibration.offsetVcmd * 0.0001) * OUTPUT_VOLT_SCALE; //8466 * 0.0001 * 4725 // 5377 * 0.0001 * 7439
     outputVoltSetpointOffset = Data_Saturation(temp - DEFAULT_OUTPUT_VOLT, 500, -500);
     if (sohOutFlag == 0)
-        Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT + outputVoltSetpointOffset); //404V
+        Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT);// + outputVoltSetpointOffset); //404V
     else
-        Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT + outputVoltSetpointOffset - 100); //394V
+        Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT);// + outputVoltSetpointOffset - 100); //394V
 
     //AHB CV Mode voltage reference
     temp = ((float)ahbCalibration.offsetVcmd * 0.0001) * CHARGE_VOLT_SCALE;
     chargeVoltSetpointOffset = Data_Saturation(temp - DEFAULT_CHARGE_VOLT, 500, -500);
-    ahbVoltSetpoint = ((OUTPUT_VOLT_BATT(DEFAULT_CHARGE_VOLT + chargeVoltSetpointOffset)) * __IQ(0.1, 14)) >> 14;
+    ahbVoltSetpoint = ((OUTPUT_VOLT_BATT(DEFAULT_CHARGE_VOLT)) * __IQ(0.1, 14)) >> 14;// + chargeVoltSetpointOffset
 
     //AHB CC Mode current reference
     if (sohOutChgFlag)
