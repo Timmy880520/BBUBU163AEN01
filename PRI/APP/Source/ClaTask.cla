@@ -96,7 +96,7 @@ __interrupt void CLA_ADC_A1_ISR(void)//claBuckControl(void)
         CLA_ADC_VOUT = AdcbResultRegs.ADCRESULT1; // AdcbResultRegs.ADCRESULT1; ADC_VO_COMP
 //    else
 //        CLA_ADC_VOUT = AdccResultRegs.ADCRESULT0; // AdccResultRegs.ADCRESULT0; ADC_VO_ORING
-        DACA_VAL(CLA_ADC_VOUT);
+
 //    CLA_ADC_VOUT = AdccResultRegs.ADCRESULT0 * claLlcState.bit.softStart + AdcbResultRegs.ADCRESULT1 * (!claLlcState.bit.softStart);
 
     CLA_ADC_IOUT = AdcaResultRegs.ADCRESULT1;
@@ -748,7 +748,7 @@ void CLA_AHB_V_Loop_Routine(void)
 
 void CLA_AHB_I_Loop_Routine(void)
 {
-//    ahbCurrLoop.error = (float)(2240 - CPU_AHB_Iout);
+//    ahbCurrLoop.error = (float)(600 - CPU_AHB_Iout);
     ahbCurrLoop.error = (float)(CPU_ICharge_Ref - CPU_AHB_Iout);
     ahbCurrLoop.pYn = ahbCurrLoop.kp * ahbCurrLoop.error;
     ahbCurrLoop.iYn = ahbCurrLoop.ki * ahbCurrLoop.error;

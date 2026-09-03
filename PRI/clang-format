@@ -1,0 +1,144 @@
+---
+# ==============================================================================
+# Clang-Format 程式碼排版設定檔
+#
+# 【功用說明】
+# 此檔案用於定義 C/C++ 程式碼的自動格式化 (Formatting) 規則。
+# 搭配 VS Code 的 C/C++ 擴充功能，當您儲存檔案或執行「格式化文件」時，
+# 編輯器會自動依照此檔案內的規則進行縮排、換行、對齊，
+# 確保團隊中每一個人的程式碼風格都保持整齊且一致。
+# ==============================================================================
+
+Language:        Cpp                  # 設定適用語言為 C/C++
+AccessModifierOffset: -2              # 類別存取修飾詞 (public/private) 的縮排位移 (比 class 內縮 2 格)
+AlignAfterOpenBracket: Align          # 括號後的換行會自動對齊括號位置
+AlignConsecutiveMacros: true          # 對齊連續的巨集 (Macro)
+AlignConsecutiveAssignments: true     # 對齊連續的賦值等號 (=)
+AlignConsecutiveDeclarations: true    # 對齊連續的變數宣告
+AlignEscapedNewlines: Left            # 多行巨集的反斜線 (\) 對齊方式：靠左
+AlignOperands:   true                 # 對齊多行的二元運算子
+AlignTrailingComments: true           # 對齊行尾的註解 (//)
+AllowAllConstructorInitializersOnNextLine: true # 允許建構子的初始化列表在下一行排列
+
+AllowAllArgumentsOnNextLine: true     # 允許函式呼叫的參數全部換到下一行
+BinPackArguments: true                # 允許將函式呼叫的參數擠在同一行 (只要沒超過字數限制)
+AllowAllParametersOfDeclarationOnNextLine: true # 允許函式宣告的參數全部換到下一行
+BinPackParameters: true               # 允許將函式宣告的參數擠在同一行
+
+AllowShortBlocksOnASingleLine: false  # 不允許將短的區塊 { } 放在同一行
+AllowShortCaseLabelsOnASingleLine: false # 不允許 switch 的 case 標籤與程式碼在同一行
+AllowShortFunctionsOnASingleLine: None # 不允許短函式寫在同一行
+AllowShortLambdasOnASingleLine: All   # 允許短的 Lambda 表達式寫在同一行
+AllowShortIfStatementsOnASingleLine: Never # 不允許短的 if 敘述寫在同一行
+AllowShortLoopsOnASingleLine: false   # 不允許短的迴圈 (for/while) 寫在同一行
+AlwaysBreakAfterDefinitionReturnType: None # 函式定義的回傳值後不強制換行
+AlwaysBreakAfterReturnType: None      # 函式宣告的回傳值後不強制換行
+AlwaysBreakBeforeMultilineStrings: false # 多行字串前不強制換行
+AlwaysBreakTemplateDeclarations: MultiLine # 樣板 (Template) 宣告超過一行時強制換行
+
+# ==============================================================================
+# 大括號 { } 的換行規則 (BreakBeforeBraces: Custom 啟動以下細部設定)
+# ==============================================================================
+BraceWrapping:
+  AfterCaseLabel:  true               # case 標籤後的大括號換行
+  AfterClass:      true               # class 宣告的大括號換行
+  AfterControlStatement: true         # 控制敘述 (if/for/while) 的大括號換行
+  AfterEnum:       true               # enum 宣告的大括號換行
+  AfterFunction:   true               # 函式宣告的大括號換行
+  AfterNamespace:  true               # namespace 的大括號換行
+  AfterObjCDeclaration: true          # Objective-C 宣告大括號換行
+  AfterStruct:     true               # struct 宣告的大括號換行
+  AfterUnion:      true               # union 宣告的大括號換行
+  AfterExternBlock: true              # extern 區塊大括號換行
+  BeforeCatch:     true               # catch 前的大括號換行
+  BeforeElse:      true               # else 前的大括號換行
+  IndentBraces:    false              # 大括號本身不額外縮排
+  SplitEmptyFunction: false           # 空的函式大括號不拆成兩行
+  SplitEmptyRecord: false             # 空的類別/結構大括號不拆成兩行
+  SplitEmptyNamespace: false          # 空的 namespace 大括號不拆成兩行
+
+BreakAfterJavaFieldAnnotations: false
+BreakBeforeBinaryOperators: None      # 二元運算子 (如 +, -) 不強制在前面換行
+BreakBeforeBraces: Custom             # 使用自訂的大括號換行規則 (對應上方的 BraceWrapping)
+BreakBeforeTernaryOperators: false    # 三元運算子 (?:) 不強制在前面換行
+BreakBeforeInheritanceComma: false    # 繼承列表的逗號不強制換行
+BreakConstructorInitializers: AfterColon # 建構子初始化列表在冒號 (:) 後換行
+BreakInheritanceList: AfterColon      # 繼承列表在冒號 (:) 後換行
+BreakStringLiterals: true             # 允許在字串字面量中換行
+ColumnLimit:     120                  # 每行最多字元數限制 (120字元，超過會自動換行)
+CommentPragmas:  '^ IWYU pragma:'     # 帶有特殊標記的註解不進行格式化
+CompactNamespaces: false              # 不將多層 namespace 壓縮在同一行
+ConstructorInitializerAllOnOneLineOrOnePerLine: false # 不要求建構子初始化必須全在同一行或全換行
+ConstructorInitializerIndentWidth: 4  # 建構子初始化的縮排空格數
+ContinuationIndentWidth: 4            # 換行後的延續程式碼縮排空格數
+Cpp11BracedListStyle: true            # 使用 C++11 的大括號列表風格
+DerivePointerAlignment: false         # 停用指標自動推導，強制使用下方設定的 PointerAlignment
+DisableFormat:   false                # 不停用格式化 (設為 true 則此設定檔無效)
+ExperimentalAutoDetectBinPacking: false # 關閉實驗性的自動參數打包偵測
+FixNamespaceComments: true            # 自動在 namespace 結尾加上 // namespace XXX 註解
+ForEachMacros:                        # 定義哪些巨集視為 foreach 迴圈
+  - foreach
+  - Q_FOREACH
+  - BOOST_FOREACH
+IncludeBlocks: Preserve               # 保持現有 #include 區塊的順序，不隨意合併
+IncludeCategories:                    # 定義 #include 的排序優先級 (數字越小排越上面)
+  - Regex:           '^"(.*)\.h"'     # 本機自訂標頭檔
+    Priority:        10
+    CaseSensitive:   true
+  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
+    Priority:        20
+  - Regex:           '^(<|"(gtest|gmock|isl|json)/)'
+    Priority:        30
+  - Regex:           '.*'             # 其他標準庫系統標頭檔
+    Priority:        40
+
+# IndentCaseBlocks: false             # (原檔已被註解)
+IndentCaseLabels: true                # switch 中的 case 標籤要縮排
+# IndentExternBlock: AfterExternBlock # (原檔已被註解)
+IndentPPDirectives: None              # 預處理器指令 (#if, #define) 不強制縮排
+IndentWidth:     4                    # 標準縮排的寬度 (4 個空格)
+IndentWrappedFunctionNames: true      # 換行的函式名稱要縮排
+KeepEmptyLinesAtTheStartOfBlocks: false # 刪除區塊開頭的多餘空行
+MacroBlockBegin: ''                   # 用於識別巨集區塊開頭的正則表達式
+MacroBlockEnd:   ''                   # 用於識別巨集區塊結尾的正則表達式
+MaxEmptyLinesToKeep: 1                # 程式碼中最多連續保留 1 行空行
+NamespaceIndentation: None            # namespace 內部的程式碼不額外縮排
+
+# ==============================================================================
+# Penalties (換行懲罰值：數字越大，Clang-Format 越「不願意」在該處換行)
+# ==============================================================================
+PenaltyBreakAssignment: 10            # 在賦值處換行的懲罰
+PenaltyBreakBeforeFirstCallParameter: 30 # 在第一個參數前換行的懲罰
+PenaltyBreakComment: 10               # 切斷註解的懲罰
+PenaltyBreakFirstLessLess: 0          # 在第一個 << 換行的懲罰 (cout)
+PenaltyBreakString: 10                # 切斷字串的懲罰
+PenaltyExcessCharacter: 100           # 超出單行 120 字元限制的懲罰
+PenaltyReturnTypeOnItsOwnLine: 60     # 回傳值單獨一行的懲罰
+
+PointerAlignment: Right               # 指標星號 (*) 靠右對齊 (例如：int *p)
+ReflowComments:  false                # 關閉自動重排註解內容
+SortIncludes:    true                 # 自動依照英文字母與上方層級排序 #include
+SortUsingDeclarations: true           # 自動排序 using 宣告
+SpaceAfterCStyleCast: false           # C 風格轉型後不加空格 (例如：(int)a)
+SpaceAfterLogicalNot: false           # 邏輯非 (!) 後不加空格
+SpaceAfterTemplateKeyword: true       # template 關鍵字後加空格
+SpaceBeforeAssignmentOperators: true  # 賦值等號 (=) 前加空格
+SpaceBeforeCpp11BracedList: false     # C++11 大括號前不加空格
+SpaceBeforeCtorInitializerColon: false # 建構子初始化的冒號前不加空格
+SpaceBeforeInheritanceColon: false    # 繼承的冒號前不加空格
+SpaceBeforeParens: ControlStatements  # 只有控制敘述 (if/for/while) 的括號前才加空格
+SpaceBeforeRangeBasedForLoopColon: true # C++11 range-for 的冒號前加空格
+SpaceInEmptyParentheses: false        # 空括號 () 內不加空格
+SpacesBeforeTrailingComments: 1       # 行尾註解前保留 1 個空格
+SpacesInAngles:  false                # 角括號 <> 內不加空格 (例如：<int>)
+SpacesInCStyleCastParentheses: false  # C 風格轉型的括號內不加空格
+SpacesInContainerLiterals: false      # 容器字面量的括號內不加空格
+SpacesInParentheses: false            # 一般括號 () 內不加空格
+SpacesInSquareBrackets: false         # 中括號 [] 內不加空格
+Standard:        Cpp11                # 遵循 C++11 標準的排版規則
+StatementMacros:                      # 視為單一敘述的巨集
+  - Q_UNUSED
+  - QT_REQUIRE_VERSION
+TabWidth:        4                    # 每個 Tab 字元相當於 4 個空格
+UseTab:          Never                # 絕對不使用 Tab，全面以 4 個空格(Space)取代
+...

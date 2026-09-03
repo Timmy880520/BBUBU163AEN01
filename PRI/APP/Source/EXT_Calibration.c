@@ -147,15 +147,16 @@ void Reload_Ext_Calibration_Data(void)
     //AHB CC Mode current reference
     if (sohOutChgFlag)
     {
-        temp = ((float)ahbCalibration.offsetIcmd * 0.000457) * CHARGE_CURR_SCALE;
-        chargeCurrSetpointOffset = Data_Saturation(temp - DEFAULT_CHARGE_CURR2, 500, -500);
-        Set_Current_Setpoint(DEFAULT_CHARGE_CURR2 + chargeCurrSetpointOffset);
+//        temp = ((float)ahbCalibration.offsetIcmd * 0.000457) * CHARGE_CURR_SCALE;
+//        chargeCurrSetpointOffset = Data_Saturation(temp - DEFAULT_CHARGE_CURR2, 500, -500);
+//        Set_Current_Setpoint(DEFAULT_CHARGE_CURR2 + chargeCurrSetpointOffset);
+        Set_Current_Setpoint(DEFAULT_CHARGE_CURR1);//+ chargeCurrSetpointOffset
     }
     else
     {
-        temp = ((float)ahbCalibration.offsetIcmd * 0.000457) * CHARGE_CURR_SCALE;
-        chargeCurrSetpointOffset = Data_Saturation(temp - DEFAULT_CHARGE_CURR1, 500, -500);
-        Set_Current_Setpoint(DEFAULT_CHARGE_CURR1 + chargeCurrSetpointOffset);
+//        temp = ((float)ahbCalibration.offsetIcmd * 0.000457) * CHARGE_CURR_SCALE;
+//        chargeCurrSetpointOffset = Data_Saturation(temp - DEFAULT_CHARGE_CURR1, 500, -500);
+        Set_Current_Setpoint(DEFAULT_CHARGE_CURR1);//+ chargeCurrSetpointOffset
     }
 }
 /**************************************************************************************************

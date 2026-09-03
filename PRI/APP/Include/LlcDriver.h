@@ -40,7 +40,7 @@ History:
 #define OUTPUT_VOLT(v)          (long)(((long)(v) * __IQ(1 / 743.985f, 24)) >> 10)  //743.985
 #define OUTPUT_VOLT_BUS(v)      (long)(((long)(v) * __IQ(1 / 991.000f, 24)) >> 10)  //743.985 //new add 472.478
 #define OUTPUT_VOLT_BATT(v)     (long)(((long)(v) * __IQ(1 / 373.924f, 24)) >> 10)  //743.985 //new add 373.924
-#define OUTPUT_CURR(i)          (long)(((long)(i) * __IQ(1 / 21.88f, 24)) >> 10)    //100.0f  //new add 21.88
+#define OUTPUT_CURR(i)          (long)(((long)(i) * __IQ(1 / 11.11f, 24)) >> 10)    //100.0f  //new add 21.88
 #define OUTPUTDIS_CURR(i)       (long)(((long)(i) * __IQ(1 / 101.2f, 24)) >> 10)    //200.0f  //new add 101.2
 
 #define Default_SOH_I_PI_KP     0.01*0.001f

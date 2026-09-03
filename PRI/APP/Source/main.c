@@ -286,7 +286,7 @@ Create_CMA_Real_Value(avgBattVolt, adcBattVolt, 2, 5,llcCalibration.gainVin, \
                       llcCalibration.offsetVin , 3739); //New add 3739.24->3739 //7439.85->7440
 
 Create_CMA_Real_Value(avgChargeCurr, adcChargeCurr, 2, 5, ahbCalibration.gainIout, \
-                      ahbCalibration.offsetIout, 2188); //2188 sens (150mV/A) //10000 sens (33mV/A)
+                      ahbCalibration.offsetIout, 1111); //2188 sens (150mV/A) //10000 sens (33mV/A)
 
 Create_CMA_Real_Value(avgChargeVolt, adcChargeVolt, 2, 5, ahbCalibration.gainVout, \
                       ahbCalibration.offsetVout, 3739); //New add 3739.24->3739 //7439.85->7440
@@ -319,7 +319,7 @@ int main(void)
     workingState = POWERON_MODE;//POWERON_MODE
     flagPowerOn = false;
 
-    DACA_VAL(0);
+    DACA_VAL(372);
     DACB_VAL(0);
 
     while(1)
@@ -408,6 +408,7 @@ void State_Machine(void)
     {
     default:
     case POWERON_MODE:
+        DACA_VAL(992);
         // Power on will do nothing till 8s is counted
         if (++countPowerOn >= COUNT_8s_IN_2kHz)
         {
@@ -416,8 +417,8 @@ void State_Machine(void)
             Bypass_AUX_RLY();
 //            workingState = SLEEP_MODE;
             countSleep = 0;
-//            workingState = PRECHARGE_MODE;
-            workingState = DISCHARGER_SOFTSTART_MODE;
+            workingState = PRECHARGE_MODE;
+//            workingState = DISCHARGER_SOFTSTART_MODE;
             powerOnStateCheck = STATE_PRECHG_INIT;
 
         }
@@ -448,7 +449,6 @@ void State_Machine(void)
 
     case PRECHARGE_MODE:
         dcdcState.bit.prechargeOK = true;
-
         Precharge_Procedure();
 
         if (prechargeDone)
@@ -474,7 +474,7 @@ void State_Machine(void)
 
     case STANDBY_MODE:
         dcdcState.bit.standbyOK = true;
-
+        DACA_VAL(0);
 //        if (warningCode.status2.bit.FAILOUT)
 //        {
 //            BBU_Fault();
@@ -661,25 +661,26 @@ void State_Machine(void)
 
     case CHARGER_MODE:
         dcdcState.bit.chargerOK = true;
-
+        DACA_VAL(4095);
+        if (warningCode.flag.bit.vBattOvFault|| warningCode.flag.bit.vOutUvFault)
 //        if (warningCode.status2.bit.ESTOP1   || warningCode.status2.bit.ESTOP2   || warningCode.flag.bit.vBattOvFault      || warningCode.flag.bit.iChargeOcFault \
 //        ||  warningCode.flag.bit.vOutUvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || warningCode.status2.bit.FAILOUT)
-//        {
-//            Warning_Storage();
-//
-//            if (++countAhbTurnOff > COUNT_1ms_IN_2kHz)
-//            {
-//                countAhbTurnOff = 0;
-//                sohOutChgFlag = 0;
-//                Set_Ahb_Mode(AHB_OFF_MODE);
-//                CHG_Driver_Disable();
-//                workingState = LATCH_MODE;
-//                powerOnStateCheck = STATE_CHECK_VOLTAGE;
-//            }
-//
-//            if (warningCode.status2.bit.FAILOUT)
-//                BBU_Fault();
-//        }
+        {
+            Warning_Storage();
+
+            if (++countAhbTurnOff > COUNT_1ms_IN_2kHz)
+            {
+                countAhbTurnOff = 0;
+                sohOutChgFlag = 0;
+                Set_Ahb_Mode(AHB_OFF_MODE);
+                CHG_Driver_Disable();
+                workingState = LATCH_MODE;
+                powerOnStateCheck = STATE_CHECK_VOLTAGE;
+            }
+
+            if (warningCode.status2.bit.FAILOUT)
+                BBU_Fault();
+        }
 //        else if (warningCode.flag.bit.chgOTP         || warningCode.flag.bit.chgOTW        || warningCode.flag.bit.AMB_OTP        || warningCode.flag.bit.AMB_OTW \
 //              || warningCode.flag.bit.fan1FrontFault || warningCode.flag.bit.fan1RearFault || warningCode.flag.bit.fan2FrontFault || warningCode.flag.bit.fan2RearFault \
 //              || (bbuItem.flag.cFet == 0)            || (bbuItem.flag.dFet == 0)           || (warningCode.status2.bit.chgEnOut == 0))
@@ -798,6 +799,7 @@ void Precharge_Procedure(void)
     {
         case STATE_PRECHG_INIT:
         {
+            DACA_VAL(1613);//1.3
             countDelayprecharge1 = 0;
             countDelayprecharge2 = 0;
             countDelayprecharge3 = 0;
@@ -808,6 +810,7 @@ void Precharge_Procedure(void)
         }
         case STATE_BYPASS_RLY1:
         {
+            DACA_VAL(1861);//1.5
             if (++countDelayprecharge1 >= COUNT_5s_IN_2kHz)
             {
                 Bypass_PRECHG1_RLY();
@@ -819,6 +822,7 @@ void Precharge_Procedure(void)
         }
         case STATE_PRECHG_BATT_CHG_CAP: //4
         {
+            DACA_VAL(2109);//1.7
             long diff = ABS(avgChargeVolt.cma - avgBattVolt.cma);
 
             if (diff <= PRECHG_DIFF_THREDHOLD)
@@ -828,8 +832,8 @@ void Precharge_Procedure(void)
                     Bypass_BATT_RLY();
                     CHG_Driver_Disable();
                     Set_Ahb_Mode(AHB_OFF_MODE);
-//                    targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
-                    targetVolt = OUTPUT_VOLT_BATT(217);
+                    targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
+//                    targetVolt = OUTPUT_VOLT_BATT(217);
                     powerOnStateCheck = STATE_PRECHG_CHG_OUTPUT;
                 }
             }
@@ -848,6 +852,7 @@ void Precharge_Procedure(void)
         }
         case STATE_PRECHG_CHG_OUTPUT:
         {
+            DACA_VAL(2357);//1.9
             ahbVoltReference += 2;
 
             if (ahbVoltReference >= targetVolt)
@@ -862,6 +867,7 @@ void Precharge_Procedure(void)
         }
         case STATE_CHECK_FOR_Pd_FET:
         {
+            DACA_VAL(2605);//2.1
             Set_Ahb_Mode(AHB_OFF_MODE);
             CHG_Driver_Disable();
             bmsFetControl.bit.PredFetEnable = 1;
@@ -875,6 +881,7 @@ void Precharge_Procedure(void)
         }
         case STATE_CHECK_FOR_D_FET:
         {
+            DACA_VAL(2854);//2.3
 //            if (avgBattVolt.val >= (bmsData.battOverallVolt - 50)) //Unit 0.1V
 //            {
                 powerOnStateCheck = STATE_COMPLETED; //7
@@ -890,14 +897,16 @@ void Precharge_Procedure(void)
         }
         case STATE_CHECK_VOLTAGE: //8
         {
+            DACA_VAL(3102);//2.5
             ahbVoltReference = OUTPUT_VOLT_BATT(0.1*(float)avgChargeVolt.val);
-//            targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
-            targetVolt = OUTPUT_VOLT_BATT(217);
+            targetVolt = OUTPUT_VOLT_BATT(0.1*(float)bmsData.battOverallVolt);
+//            targetVolt = OUTPUT_VOLT_BATT(217);
             powerOnStateCheck = STATE_PRECHG_CHG_CAP;
             break;
         }
         case STATE_PRECHG_CHG_CAP: //9
         {
+            DACA_VAL(3350);//2.7
             ahbVoltReference += 2;
             if (ahbVoltReference >= targetVolt)
             {
@@ -911,6 +920,7 @@ void Precharge_Procedure(void)
         }
         case STATE_CHECK_FOR_C_FET:
         {
+            DACA_VAL(3599);//2.9
             if (avgChargeVolt.val >= (bmsData.battOverallVolt - 50)) //Unit 0.1V
             {
                 powerOnStateCheck = STATE_COMPLETED;

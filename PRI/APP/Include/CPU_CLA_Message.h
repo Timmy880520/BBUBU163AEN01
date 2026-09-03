@@ -14,9 +14,9 @@
 #define Default_CLA_Type_III_HS_A2     0.109f   //0.201f   //0.317f   //0.109f
 
 // PI controller of type III Compensator          1k/15000   850
-#define Default_CLA_Type_III_PI_KP     0.2*0.941f //0.924f*2 //0.941f*0.2
-#define Default_CLA_Type_III_PI_KI     0.2*0.059f //0.075f*2 //0.059f*0.2
-#define Default_CLA_Type_III_PI_KC     0.063f     //0.081f*2 //0.063f
+#define Default_CLA_Type_III_PI_KP     0.0002*0.941f //0.924f*2 //0.941f*0.2
+#define Default_CLA_Type_III_PI_KI     0.0002*0.059f //0.075f*2 //0.059f*0.2
+#define Default_CLA_Type_III_PI_KC     0.0063f     //0.081f*2 //0.063f
 #define Default_CLA_Type_III_PI_KA     10.957f    //8.053f/2 //10.957f
 #define Default_CLA_Type_III_PI_Limit  0.091f*2   //0.124f*4 //0.091f*2
 
@@ -127,14 +127,14 @@
 #define Default_CLA_iYn1     (float)(Default_CLA_VEA_P0 * Default_CLA_Type_III_PI_Limit)
 #endif
 
-#define Default_AHB_V_PI_KP     0.01*0.941f
+#define Default_AHB_V_PI_KP     0.01*0.0941f
 #define Default_AHB_V_PI_KI     0.01*0.059f
 #define Default_AHB_V_PI_KC     (Default_AHB_V_PI_KI/Default_AHB_V_PI_KP) //(Ki/Kp)
 #define Default_AHB_V_PI_KA     1.0f
 #define Default_AHB_V_PI_Limit  400.0f*0.6 //TBPRD = 600
 
-#define Default_AHB_I_PI_KP     0.01*0.241f
-#define Default_AHB_I_PI_KI     0.01*0.001f
+#define Default_AHB_I_PI_KP     0.01*0.00541f
+#define Default_AHB_I_PI_KI     0.01*0.0001f
 #define Default_AHB_I_PI_KC     (Default_AHB_I_PI_KI/Default_AHB_I_PI_KP) //(Ki/Kp)
 #define Default_AHB_I_PI_KA     1.0f
 #define Default_AHB_I_PI_Limit  400.0f*0.6 //TBPRD = 600
