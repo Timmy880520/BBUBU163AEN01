@@ -662,7 +662,7 @@ void State_Machine(void)
     case CHARGER_MODE:
         dcdcState.bit.chargerOK = true;
         DACA_VAL(4095);
-        if (warningCode.flag.bit.vBattOvFault|| warningCode.flag.bit.vOutUvFault)
+        if (warningCode.flag.bit.vBattOvFault  || warningCode.flag.bit.iChargeOcFault)
 //        if (warningCode.status2.bit.ESTOP1   || warningCode.status2.bit.ESTOP2   || warningCode.flag.bit.vBattOvFault      || warningCode.flag.bit.iChargeOcFault \
 //        ||  warningCode.flag.bit.vOutUvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || warningCode.status2.bit.FAILOUT)
         {
@@ -776,24 +776,25 @@ Comment:
 **************************************************************************************************/
 void Precharge_Procedure(void)
 {
+    if (warningCode.flag.bit.vBattOvFault  || warningCode.flag.bit.iChargeOcFault)
 //    if (warningCode.status2.bit.ESTOP1   || warningCode.status2.bit.ESTOP2   || warningCode.flag.bit.vBattOvFault      || warningCode.flag.bit.iChargeOcFault \
 //    ||  warningCode.flag.bit.vOutUvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || warningCode.status2.bit.FAILOUT)
-//    {
-//        Warning_Storage();
-//
-//        powerOnStateCheck = STATE_FAULT;
-//
-//        if (++countAhbTurnOff > COUNT_200ms_IN_2kHz)
-//        {
-//            countAhbTurnOff = 0;
-//            CHG_Driver_Disable();
-//            Set_Ahb_Mode(AHB_OFF_MODE);
-//            workingState = LATCH_MODE;
-//        }
-//
-//        if (warningCode.status2.bit.FAILOUT)
-//            BBU_Fault();
-//    }
+    {
+        Warning_Storage();
+
+        powerOnStateCheck = STATE_FAULT;
+
+        if (++countAhbTurnOff > COUNT_200ms_IN_2kHz)
+        {
+            countAhbTurnOff = 0;
+            CHG_Driver_Disable();
+            Set_Ahb_Mode(AHB_OFF_MODE);
+            workingState = LATCH_MODE;
+        }
+
+        if (warningCode.status2.bit.FAILOUT)
+            BBU_Fault();
+    }
 
     switch (powerOnStateCheck)
     {
@@ -811,7 +812,7 @@ void Precharge_Procedure(void)
         case STATE_BYPASS_RLY1:
         {
             DACA_VAL(1861);//1.5
-            if (++countDelayprecharge1 >= COUNT_5s_IN_2kHz)
+            if (++countDelayprecharge1 >= COUNT_1s_IN_2kHz)
             {
                 Bypass_PRECHG1_RLY();
                 targetVolt = OUTPUT_VOLT_BATT(0.1*(float)avgBattVolt.val);
@@ -822,7 +823,7 @@ void Precharge_Procedure(void)
         }
         case STATE_PRECHG_BATT_CHG_CAP: //4
         {
-            DACA_VAL(2109);//1.7
+//            DACA_VAL(2109);//1.7
             long diff = ABS(avgChargeVolt.cma - avgBattVolt.cma);
 
             if (diff <= PRECHG_DIFF_THREDHOLD)
@@ -873,7 +874,7 @@ void Precharge_Procedure(void)
             bmsFetControl.bit.PredFetEnable = 1;
             sciProtocol.func.packTxData(&sciProtocol, 0xC6, INTERNAL_SET, LOW_PRIORITY);
 
-            if (++countDelayprecharge4 >= COUNT_5s_IN_2kHz)
+            if (++countDelayprecharge4 >= COUNT_1s_IN_2kHz)
             {
                 powerOnStateCheck = STATE_CHECK_FOR_D_FET; //7
             }
@@ -1606,15 +1607,15 @@ void State_Detection(void)
     warningCode.flag.bit.iOutOcFault = warningCode.status.bit.OCP_DISCHG_SW | warningCode.status.bit.OCP_DISCHG_IO \
                                      | warningCode.status.bit.PRI_OCP_DISCHG_IO;
 
-    if ((dcdcState.bit.chargerOK == 1) || (dcdcState.bit.prechargeOK == 1))
-    {
-        //add Battery protection
-        //VCharge OV Fault  //OVP implement by HW
-        fault = (avgChargeVolt.val > VBATT_OV_FAULT_LIMIT);
-        recovery = (avgChargeVolt.val < VBATT_OV_FAULT_RECOVERY);
-        Update_Event_State(warningCode.flag.bit.vChargeOvFault, checkVbattOvf, fault, 0);
-    }
-
-    warningCode.flag.bit.vBattOvFault = warningCode.flag.bit.vChargeOvFault | warningCode.status.bit.OVP_CHG_BATT_IO | warningCode.status.bit.OVP_BATT_IO;
+//    if ((dcdcState.bit.chargerOK == 1) || (dcdcState.bit.prechargeOK == 1))
+//    {
+//        //add Battery protection
+//        //VCharge OV Fault  //OVP implement by HW
+//        fault = (avgChargeVolt.val > VBATT_OV_FAULT_LIMIT);
+//        recovery = (avgChargeVolt.val < VBATT_OV_FAULT_RECOVERY);
+//        Update_Event_State(warningCode.flag.bit.vChargeOvFault, checkVbattOvf, fault, 0);
+//    }
+//
+//    warningCode.flag.bit.vBattOvFault = warningCode.flag.bit.vChargeOvFault | warningCode.status.bit.OVP_CHG_BATT_IO | warningCode.status.bit.OVP_BATT_IO;
 }
 //------------------------------------------------------------------------------

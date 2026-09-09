@@ -67,7 +67,7 @@ unsigned long cpuTimer1Countdown = 0, cpuTimer2Countdown = 0;
 //----- Local -----
 static Create_Timer(systemTimer, 50);
 static Create_Timer(delayResetMCU, 50e3);
-
+static short countChgOvp = 0;
 static short countChgOcp = 0;
 static short countChgScp = 0;
 
@@ -262,21 +262,37 @@ __interrupt void Timer1_ISR(void)
 //        CHG_Driver_Disable();
 //    }
 //    //====================== CHG OCP==========================
-    if(avgChargeCurr.cma > 280) //0.8A*264m*(4095/3.3)
+    if(avgChargeCurr.cma > 280 && chargerSoftstartFlag == 1) //0.8A*264m*(4095/3.3)
     {
-        if(++countChgScp > COUNT_100us_IN_50kHz)
+        if(++countChgScp > COUNT_500us_IN_50kHz)//COUNT_100us_IN_50kHz
         {
             countChgScp = 0;
             Set_Ahb_Mode(AHB_OFF_MODE);
             CHG_Driver_Disable();
             warningCode.flag.bit.iChargeOcFault = 1;
-            DACB_VAL(2480);
         }
     }
     else
     {
         countChgScp = 0;
     }
+//    //====================== CHG OVP==========================
+      if(avgChargeVolt.val > VBATT_OV_FAULT_LIMIT)
+      {
+          if(++countChgOvp > COUNT_100us_IN_50kHz)
+          {
+              countChgOvp = 0;
+              Set_Ahb_Mode(AHB_OFF_MODE);
+              CHG_Driver_Disable();
+              warningCode.flag.bit.vBattOvFault = 1;
+          }
+      }
+    if(warningCode.flag.bit.iChargeOcFault)
+        DACB_VAL(2480);
+    else if(warningCode.flag.bit.vBattOvFault)
+        DACB_VAL(4090);
+    else
+        DACB_VAL(0);
 //
 //    if(avgChargeCurr.cma > 372) //2A*150m*(4095/3.3) = 372.2
 //    {
