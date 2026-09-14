@@ -241,8 +241,8 @@ History:
 // ADV Voltage unit: 0.1V, current unit: 0.01A
 // Limit value
 //Vout
-#define VOUT_OV_FAULT_LIMIT     (long)4450  //5250//5810//5775//6000
-#define VOUT_OV_FAULT_RECOVERY  (long)4250  //pending//5110//5575
+#define VOUT_OV_FAULT_LIMIT     (long)4100  //5250//5810//5775//6000
+#define VOUT_OV_FAULT_RECOVERY  (long)4050  //pending//5110//5575
 #define VOUT_UV_FAULT_LIMIT     (long)3000  //4700//4700//4775
 #define VOUT_FUV_FAULT_LIMIT    (long)3000  //4775
 #define VOUT_UV_FAULT_RECOVERY  (long)4000  //4800//4975

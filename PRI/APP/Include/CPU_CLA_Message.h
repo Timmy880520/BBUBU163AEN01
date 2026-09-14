@@ -14,9 +14,9 @@
 #define Default_CLA_Type_III_HS_A2     0.109f   //0.201f   //0.317f   //0.109f
 
 // PI controller of type III Compensator          1k/15000   850
-#define Default_CLA_Type_III_PI_KP     0.0002*0.941f //0.924f*2 //0.941f*0.2
-#define Default_CLA_Type_III_PI_KI     0.0002*0.059f //0.075f*2 //0.059f*0.2
-#define Default_CLA_Type_III_PI_KC     0.0063f     //0.081f*2 //0.063f
+#define Default_CLA_Type_III_PI_KP     0.2*0.941f //0.924f*2 //0.941f*0.2
+#define Default_CLA_Type_III_PI_KI     0.08*0.059f //0.075f*2 //0.059f*0.2
+#define Default_CLA_Type_III_PI_KC     0.063f     //0.081f*2 //0.063f
 #define Default_CLA_Type_III_PI_KA     10.957f    //8.053f/2 //10.957f
 #define Default_CLA_Type_III_PI_Limit  0.091f*2   //0.124f*4 //0.091f*2
 

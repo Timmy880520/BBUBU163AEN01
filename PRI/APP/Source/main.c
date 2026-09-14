@@ -417,17 +417,17 @@ void State_Machine(void)
             Bypass_AUX_RLY();
 //            workingState = SLEEP_MODE;
             countSleep = 0;
-            workingState = PRECHARGE_MODE;
-//            workingState = DISCHARGER_SOFTSTART_MODE;
+//            workingState = PRECHARGE_MODE;
+            workingState = STANDBY_MODE;
             powerOnStateCheck = STATE_PRECHG_INIT;
 
         }
 
-//        dcdcState.bit.bbukill = warningCode.status2.bit.bbuKill;
+        dcdcState.bit.bbukill = warningCode.status2.bit.bbuKill;
         break;
 
     case SLEEP_MODE:
-        if ((avgOutputVolt.cma > (OUTPUT_VOLT_BUS(350) >> 2)) && (warningCode.status2.bit.ESTOP1 == 0) && (warningCode.status2.bit.ESTOP2 == 0) \
+        if ((avgOutputVolt.cma > (OUTPUT_VOLT_BUS(750) >> 2)) && (warningCode.status2.bit.ESTOP1 == 0) && (warningCode.status2.bit.ESTOP2 == 0) \
         && warningCode.status2.bit.bbuKill                    && ((1900 <= bmsData.battOverallVolt)    && (3100 >= bmsData.battOverallVolt)))
         {
             if (bbuItem.flag.dFet && ++countSleep >= COUNT_100ms_IN_2kHz)
@@ -486,18 +486,19 @@ void State_Machine(void)
 //        }
 //        else if ((dcdcState.bit.acLoss   || warningCode.status2.bit.SYNC_START || (forceDischarge == 0xDC) || ((learningMode == 0x01) && warningCode.status2.bit.sohOut)) \
 //              && (warningCode.flag.bit.vBattUvFault == 0))
-//        {
-//            if ((learningMode == 0x01) && warningCode.status2.bit.sohOut)
-//            {
-//                sohOutFlag = 1;
-//                sohOutChgFlag = 1;
-//                learningCycle.all = 0;
-//                cpuLlcState.bit.sohOutFlag = 1;
-//                Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT + outputVoltSetpointOffset - 100); //394V
-//            }
-//
-//            Turn_On_Procedure();
-//        }
+        if (dcdcState.bit.acLoss  && (warningCode.flag.bit.vBattUvFault == 0))
+        {
+            if ((learningMode == 0x01) && warningCode.status2.bit.sohOut)
+            {
+                sohOutFlag = 1;
+                sohOutChgFlag = 1;
+                learningCycle.all = 0;
+                cpuLlcState.bit.sohOutFlag = 1;
+                Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT + outputVoltSetpointOffset - 100); //394V
+            }
+
+            Turn_On_Procedure();
+        }
 //        else if ((warningCode.flag.bit.chgOTP == 0)         && (warningCode.flag.bit.chgOTW == 0)                && (warningCode.flag.bit.AMB_OTP == 0)        && (warningCode.flag.bit.AMB_OTW == 0) \
 //              && (warningCode.flag.bit.fan1FrontFault == 0) && (warningCode.flag.bit.fan1RearFault == 0)         && (warningCode.flag.bit.fan2FrontFault == 0) && (warningCode.flag.bit.fan2RearFault == 0) \
 //              && (dcdcState.bit.acLoss == 0)                && (avgOutputVolt.cma > (OUTPUT_VOLT_BUS(350) >> 2)) && warningCode.status2.bit.chgEnOut)
@@ -540,9 +541,7 @@ void State_Machine(void)
         break;
 
     case DISCHARGER_SOFTSTART_MODE:
-//        Turn_Off_Procedure();
-        Set_Voltage_Setpoint(DEFAULT_OUTPUT_VOLT); //not here
-        Turn_On_Procedure();//not here
+        Turn_Off_Procedure();
         LLC_Driver_Enable();
         softstartFlag = 1;
 
@@ -552,13 +551,13 @@ void State_Machine(void)
             softstartFlag = 0;
             flagSrTurnOn = false;
             delaySrTurnOn = COUNT_100ms_IN_2kHz;
-//            workingState = DISCHARGER_MODE;
+            workingState = DISCHARGER_MODE;
         }
         break;
 
     case DISCHARGER_MODE:
-//        if (sohOutFlag == 0)
-//            dcdcState.bit.dischargerOK = true;
+        if (sohOutFlag == 0)
+            dcdcState.bit.dischargerOK = true;
 //
 //        if (sohOutFlag == 1 && (dcdcState.bit.acLoss || warningCode.status2.bit.SYNC_START) && (warningCode.flag.bit.vBattUvFault == 0))
 //        {
@@ -597,26 +596,26 @@ void State_Machine(void)
 //            Timer_Reset(dischargerOperationTimer);
 //        }
 //
-//        Turn_Off_Procedure();
-//
-//        // Oring control
-//        Range_Check(&protOringCtrl);
-//        if (protOringCtrl.flag == OVER_RANGE)   // Use output current to determine oring on-off
-//        {
-//            if(++countOringTurnOn >= delayOringTurnOn)
-//            {
-//                countOringTurnOn = 0;
-//                Oring_On();
-//            }
-//        }
-//        else if (protOringCtrl.flag == UNDER_RANGE)   // < 5Av & de-bounce 10ms, disable ORING
-//        {
-//            if (++countOringTurnOff >= COUNT_10ms_IN_1kHz)
-//            {
-//                countOringTurnOff = 0;
-//                Oring_Off();
-//            }
-//        }
+        Turn_Off_Procedure();
+
+        // Oring control
+        Range_Check(&protOringCtrl);
+        if (protOringCtrl.flag == OVER_RANGE)   // Use output current to determine oring on-off
+        {
+            if(++countOringTurnOn >= delayOringTurnOn)
+            {
+                countOringTurnOn = 0;
+                Oring_On();
+            }
+        }
+        else if (protOringCtrl.flag == UNDER_RANGE)   // < 5Av & de-bounce 10ms, disable ORING
+        {
+            if (++countOringTurnOff >= COUNT_10ms_IN_1kHz)
+            {
+                countOringTurnOff = 0;
+                Oring_Off();
+            }
+        }
 //
 //        // SR control refer to output current
 //        Range_Check(&protSrTurnOn);
@@ -982,53 +981,53 @@ Comment:
 **************************************************************************************************/
 void Turn_Off_Procedure(void)
 {
-    if (warningCode.flag.bit.srOTP           || warningCode.flag.bit.srOTW               || warningCode.flag.bit.oringOTP        || warningCode.flag.bit.oringOTW \
-    ||  warningCode.flag.bit.dchgOTP         || warningCode.flag.bit.dchgOTW             || warningCode.flag.bit.AMB_OTP         || warningCode.flag.bit.AMB_OTW \
-    ||  warningCode.flag.bit.fan1FrontFault  || warningCode.flag.bit.fan1RearFault       || warningCode.flag.bit.fan2FrontFault  || warningCode.flag.bit.fan2RearFault \
-    || (dcdcState.bit.acLoss == 0            && warningCode.status2.bit.SYNC_START == 0  && forceDischarge != 0xDC               && sohOutFlag == 0) \
-    || warningCode.flag.bit.vBattUvFault     || (bbuItem.flag.dFet == 0) \
-    || ((learningMode != 0x01                || warningCode.status2.bit.sohOut == 0)     && sohOutFlag == 1))
-    {
-        Warning_Storage();
-
-        if (++countLlcTurnOff >= COUNT_10ms_IN_2kHz)
-        {
-            if (sohOutFlag == 1)
-            {
-                if (startFwUpgrade == 1)
-                {
-                    startFwUpgrade = 0;
-                    learningCycle.bit.fwUpgrade = 1;
-                }
-                else if ((learningMode == 0x01) && warningCode.status2.bit.sohOut)
-                {
-                    learningCycle.bit.fail = 1;
-                }
-
-                learningMode = 0;
-                sohOutFlag = 0;
-                cpuLlcState.bit.sohOutFlag = 0;
-            }
-
-            highLimitFreq = 1;
-
-            Timer_Reset(dischargerOperationTimer);
-            countLlcTurnOff = 0;
-            workingState = STANDBY_MODE;
-            Set_Llc_Mode(LLC_OFF_MODE);
-            LLC_Driver_Disable();
-            SR_Driver_Disable();
-            IBUS_Disable();
-            Oring_Off();
-        }
-    }
-    else
-    {
-        countLlcTurnOff = 0;
-    }
-
-    if (warningCode.status2.bit.ESTOP1 || warningCode.status2.bit.ESTOP2    || (warningCode.status2.bit.bbuKill == 0) || warningCode.flag.bit.vOutOvFault || Timer_Flag(dischargerOperationTimer) \
-    || (countLlcFaultOff > 0)          || warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault      || warningCode.status2.bit.FAILOUT)
+//    if (warningCode.flag.bit.srOTP           || warningCode.flag.bit.srOTW               || warningCode.flag.bit.oringOTP        || warningCode.flag.bit.oringOTW \
+//    ||  warningCode.flag.bit.dchgOTP         || warningCode.flag.bit.dchgOTW             || warningCode.flag.bit.AMB_OTP         || warningCode.flag.bit.AMB_OTW \
+//    ||  warningCode.flag.bit.fan1FrontFault  || warningCode.flag.bit.fan1RearFault       || warningCode.flag.bit.fan2FrontFault  || warningCode.flag.bit.fan2RearFault \
+//    || (dcdcState.bit.acLoss == 0            && warningCode.status2.bit.SYNC_START == 0  && forceDischarge != 0xDC               && sohOutFlag == 0) \
+//    || warningCode.flag.bit.vBattUvFault     || (bbuItem.flag.dFet == 0) \
+//    || ((learningMode != 0x01                || warningCode.status2.bit.sohOut == 0)     && sohOutFlag == 1))
+//    {
+//        Warning_Storage();
+//
+//        if (++countLlcTurnOff >= COUNT_10ms_IN_2kHz)
+//        {
+//            if (sohOutFlag == 1)
+//            {
+//                if (startFwUpgrade == 1)
+//                {
+//                    startFwUpgrade = 0;
+//                    learningCycle.bit.fwUpgrade = 1;
+//                }
+//                else if ((learningMode == 0x01) && warningCode.status2.bit.sohOut)
+//                {
+//                    learningCycle.bit.fail = 1;
+//                }
+//
+//                learningMode = 0;
+//                sohOutFlag = 0;
+//                cpuLlcState.bit.sohOutFlag = 0;
+//            }
+//
+//            highLimitFreq = 1;
+//
+//            Timer_Reset(dischargerOperationTimer);
+//            countLlcTurnOff = 0;
+//            workingState = STANDBY_MODE;
+//            Set_Llc_Mode(LLC_OFF_MODE);
+//            LLC_Driver_Disable();
+//            SR_Driver_Disable();
+//            IBUS_Disable();
+//            Oring_Off();
+//        }
+//    }
+//    else
+//    {
+//        countLlcTurnOff = 0;
+//    }
+    if(warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault || warningCode.flag.bit.vOutOvFault)
+//    if (warningCode.status2.bit.ESTOP1 || warningCode.status2.bit.ESTOP2    || (warningCode.status2.bit.bbuKill == 0) || warningCode.flag.bit.vOutOvFault || Timer_Flag(dischargerOperationTimer) \
+//    || (countLlcFaultOff > 0)          || warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault      || warningCode.status2.bit.FAILOUT)
     {
         Warning_Storage();
 
