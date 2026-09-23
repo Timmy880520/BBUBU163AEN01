@@ -229,7 +229,7 @@ static unsigned short countDischargeSecond = 0;
 static unsigned short countSohOutLowPower = 0;
 static Create_Protection_Pkg(protSrTurnOn, avgOutputCurr.val, 100, 500, COUNT_10ms_IN_1kHz, COUNT_10ms_IN_1kHz, \
                              COUNT_10ms_IN_1kHz);
-static Create_Protection_Pkg(protOringCtrl, avgOutputCurr.val, 0, 300, COUNT_1ms_IN_1kHz, COUNT_1ms_IN_1kHz, \
+static Create_Protection_Pkg(protOringCtrl, avgOutputCurr.val, 62, 325, COUNT_1ms_IN_1kHz, COUNT_1ms_IN_1kHz, \
                              COUNT_1ms_IN_1kHz);
 
 // Event and protection
@@ -262,7 +262,7 @@ Create_Event_List_Object(eventList, 16);
 // ADC Scale may change depend on the unit.
 // ADV Voltage unit: 0.1V, current unit: 0.01A
 Create_CMA_Real_Value(avgOutputVolt, adcOutputVolt, 5, 5, llcCalibration.gainVout, \
-                      llcCalibration.offsetVout, 4725); //New add 4724.78->4725 //7439.85->7440
+                      llcCalibration.offsetVout, 9910); //New add 4724.78->4725 //7439.85->7440
 
 Create_CMA_Real_Value(avgOutputCurr, adcOutputCurr, 2, 5, llcCalibration.gainIout, \
                       llcCalibration.offsetIout, 11111); //11111 sens (26.4mV/A) //10120 sens (33mV/A) //13394 sens (25mV/A) //16667 sens (19.8mV/A)
@@ -584,17 +584,17 @@ void State_Machine(void)
 //            countSohOutLowPower = 0;
 //        }
 //
-//        // Count discharger operation times, maximum 60s
-//        if (++countDischargeSecond >= COUNT_1s_IN_2kHz && !warningCode.status2.bit.Engineer_OK && sohOutFlag == 0)
-//        {
-//            countDischargeSecond = 0;
-//            Call_Timer(dischargerOperationTimer);
-//            countdownDischargeTimes = Timer_Countdown(dischargerOperationTimer);
-//        }
-//        else if (warningCode.status2.bit.Engineer_OK)
-//        {
-//            Timer_Reset(dischargerOperationTimer);
-//        }
+        // Count discharger operation times, maximum 60s
+        if (++countDischargeSecond >= COUNT_1s_IN_2kHz && !warningCode.status2.bit.Engineer_OK && sohOutFlag == 0)
+        {
+            countDischargeSecond = 0;
+            Call_Timer(dischargerOperationTimer);
+            countdownDischargeTimes = Timer_Countdown(dischargerOperationTimer);
+        }
+        else if (warningCode.status2.bit.Engineer_OK)
+        {
+            Timer_Reset(dischargerOperationTimer);
+        }
 //
         Turn_Off_Procedure();
 
@@ -1025,7 +1025,7 @@ void Turn_Off_Procedure(void)
 //    {
 //        countLlcTurnOff = 0;
 //    }
-    if(warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault || warningCode.flag.bit.vOutOvFault)
+    if(warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || Timer_Flag(dischargerOperationTimer))//|| warningCode.flag.bit.vOutUvFault)
 //    if (warningCode.status2.bit.ESTOP1 || warningCode.status2.bit.ESTOP2    || (warningCode.status2.bit.bbuKill == 0) || warningCode.flag.bit.vOutOvFault || Timer_Flag(dischargerOperationTimer) \
 //    || (countLlcFaultOff > 0)          || warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault      || warningCode.status2.bit.FAILOUT)
     {
@@ -1596,9 +1596,9 @@ void State_Detection(void)
 //    Update_Event_State(warningCode.flag.bit.iOutOcFault2, checkIoutOcf2, fault, 0);
 
     //Iout OC3 Fault
-    fault = (avgOutputCurr.val > IOUT_OC3_FAULT_LIMIT);
-    recovery = (avgOutputCurr.val < IOUT_OC3_FAULT_RECOVERY);
-    Update_Event_State(warningCode.flag.bit.iOutOcFault3, checkIoutOcf3, fault, 0);
+//    fault = (avgOutputCurr.val > IOUT_OC3_FAULT_LIMIT);
+//    recovery = (avgOutputCurr.val < IOUT_OC3_FAULT_RECOVERY);
+//    Update_Event_State(warningCode.flag.bit.iOutOcFault3, checkIoutOcf3, fault, 0);
 
     warningCode.status.bit.OCP_DISCHG_SW = warningCode.flag.bit.iOutOcFault1 | warningCode.flag.bit.iOutOcFault2 \
                                          | warningCode.flag.bit.iOutOcFault3 | warningCode.flag.bit.iOutScFault4;

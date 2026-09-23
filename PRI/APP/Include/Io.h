@@ -126,8 +126,8 @@ History:
 // Macro Output Definitions
 //------------------------------------------------------------------------------
 #define Oring_Status()                      Out_Pin(Out_Enable_Oring)
-#define Oring_Off()                         Set_Pin(Out_Enable_Oring)
-#define Oring_On()                          Clear_Pin(Out_Enable_Oring)
+#define Oring_On()                          Set_Pin(Out_Enable_Oring)
+#define Oring_Off()                         Clear_Pin(Out_Enable_Oring)
 
 #define IBUS_Status()                       Out_Pin(Out_Disable_CSbus)
 #define IBUS_Disable()                      Set_Pin(Out_Disable_CSbus)

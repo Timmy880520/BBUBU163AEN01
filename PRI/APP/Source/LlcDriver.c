@@ -320,8 +320,8 @@ unsigned short Switch_Llc_Mode(void)
         llcVoltDroopParam.reference = 0;
         llcVoltDroopParam.feedback  = 0;
         llcVoltDroopParam.output    = 0;
-        llcVoltDroopParam.maximum   = (OUTPUT_VOLT_BUS(600) * __IQ(0.01, 14)) >> 14;
-        llcVoltDroopParam.minimum   = (OUTPUT_VOLT_BUS(-1200) * __IQ(0.01, 14)) >> 14;
+        llcVoltDroopParam.maximum   = (OUTPUT_VOLT_BUS(991) * __IQ(0.01, 14)) >> 14;
+        llcVoltDroopParam.minimum   = (OUTPUT_VOLT_BUS(-2020) * __IQ(0.01, 14)) >> 14;
 
         sohCurrLoop.kp       = Default_SOH_I_PI_KP;
         sohCurrLoop.ki       = Default_SOH_I_PI_KI;
@@ -938,14 +938,14 @@ void LlcController(void)
         if (!softstartDone && sohOutFlag == 1)
             sTemp = voltSetpoint;// + sohTestVolRefOffset;
         else if (!softstartDone)
-            sTemp = voltSetpoint;// + droopVoltRefOffset + csVoltRefOffset;
+            sTemp = voltSetpoint + droopVoltRefOffset ;// + csVoltRefOffset;
         else
             sTemp = voltSoftStartRef;
 
         if (sTemp < 0)
             sTemp = 0;
-        else if (sTemp > 13226) //New add 450V 15605 //800V 13226
-            sTemp = 13226;
+        else if (sTemp > 13886) //New add 450V 15605 //800V 13226
+            sTemp = 13886;
 
         llcVoltParam.reference = (long)sTemp;
 
@@ -1358,7 +1358,7 @@ Comment:
 void Voltage_Droop(void)
 {
     voltDroopVoltage = 0 - (float)avgOutputCurr.val * 0.0018f;
-    droopVoltRefOffset = voltDroopVoltage * 34.68f; //old 22.02f
+    droopVoltRefOffset = voltDroopVoltage * 96.644f; //old 22.02f
 
     droopVoltRefOffset = __IQsat(droopVoltRefOffset, llcVoltDroopParam.maximum, llcVoltDroopParam.minimum);
 }

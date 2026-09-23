@@ -105,7 +105,7 @@ History:
 
 // App version
 #ifndef App_Version
-#define App_Version             "S2.01B09"
+#define App_Version             "S2.01B10"
 #endif
 
 #ifndef Sub_Version
@@ -241,15 +241,15 @@ History:
 // ADV Voltage unit: 0.1V, current unit: 0.01A
 // Limit value
 //Vout
-#define VOUT_OV_FAULT_LIMIT     (long)4100  //5250//5810//5775//6000
-#define VOUT_OV_FAULT_RECOVERY  (long)4050  //pending//5110//5575
-#define VOUT_UV_FAULT_LIMIT     (long)3000  //4700//4700//4775
-#define VOUT_FUV_FAULT_LIMIT    (long)3000  //4775
-#define VOUT_UV_FAULT_RECOVERY  (long)4000  //4800//4975
+#define VOUT_OV_FAULT_LIMIT     (long)4120  //5250//5810//5775//6000
+#define VOUT_OV_FAULT_RECOVERY  (long)4020  //pending//5110//5575
+#define VOUT_UV_FAULT_LIMIT     (long)7500  //4700//4700//4775
+#define VOUT_FUV_FAULT_LIMIT    (long)7500  //4775
+#define VOUT_UV_FAULT_RECOVERY  (long)7790  //4800//4975
 
 //Iout
-#define IOUT_OC1_FAULT_LIMIT    (long)5000  //3000  //5000
-#define IOUT_OC1_FAULT_RECOVERY (long)4325  //2500  //4325
+#define IOUT_OC1_FAULT_LIMIT    (long)2300  //2300  //5000
+#define IOUT_OC1_FAULT_RECOVERY (long)1600  //1600  //4325
 #define IOUT_OC2_FAULT_LIMIT    (long)29508 //6000//13920//TBD
 #define IOUT_OC2_FAULT_RECOVERY (long)25620 //1098//12920
 #define IOUT_OC3_FAULT_LIMIT    (long)6920  //14880
