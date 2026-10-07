@@ -1025,7 +1025,7 @@ void Turn_Off_Procedure(void)
 //    {
 //        countLlcTurnOff = 0;
 //    }
-    if(warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0) || Timer_Flag(dischargerOperationTimer))//|| warningCode.flag.bit.vOutUvFault)
+    if(warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault || warningCode.flag.bit.vOutOvFault || (warningCode.status2.bit.bbuKill == 0))// || Timer_Flag(dischargerOperationTimer))//|| warningCode.flag.bit.vOutUvFault)
 //    if (warningCode.status2.bit.ESTOP1 || warningCode.status2.bit.ESTOP2    || (warningCode.status2.bit.bbuKill == 0) || warningCode.flag.bit.vOutOvFault || Timer_Flag(dischargerOperationTimer) \
 //    || (countLlcFaultOff > 0)          || warningCode.flag.bit.iOutOcFault  || warningCode.flag.bit.vBattOvFault      || warningCode.status2.bit.FAILOUT)
     {

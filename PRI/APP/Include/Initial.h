@@ -20,7 +20,7 @@ History:
 /* Macro definitions */
 // Statement Replacement
 #define OUTPUT_VOLT_SCALE               (9910.0f)   //New add 400V BBU 4725 //400V BBU 7439
-#define DEFAULT_OUTPUT_VOLT_RATIO       (8274.0f)   //New add 800/991 = 0.8072 //820/991 = 0.8274
+#define DEFAULT_OUTPUT_VOLT_RATIO       (4036.0f)   //New add 800/991 = 0.8072 //820/991 = 0.8274
 #define DEFAULT_OUTPUT_VOLT             (long)(OUTPUT_VOLT_SCALE * DEFAULT_OUTPUT_VOLT_RATIO / 1e4f)
 
 #define CURR_ADC1_OFFSET                (unsigned short)2047//400V BBU
